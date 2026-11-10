@@ -4,16 +4,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Math Merge</title>
+<meta name="theme-color" content="#14141f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Math Merge">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" href="icon.png">
 <style>
 :root{--bg:#14141f;--panel:#232336;--panel2:#2d2d45;--text:#fff;--muted:#9aa0b8;--good:#2ee59d;--bad:#ff6b85;--gold:#ffc300}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;overscroll-behavior:none}
-button{font:inherit;color:inherit;cursor:pointer}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
 .screen{position:absolute;inset:0;display:none;flex-direction:column}
 .screen.active{display:flex}
 
 /* ---------- menu ---------- */
-#menu{align-items:stretch;padding:18px 16px 24px;gap:10px;overflow-y:auto}
+#menu{align-items:stretch;padding:calc(18px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));gap:10px;overflow-y:auto}
 h1{font-size:46px;font-weight:900;text-align:center;line-height:1.05;margin-top:4px;
   background:linear-gradient(90deg,#ffc300,#ff4d6d 50%,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
 .tag{text-align:center;color:var(--muted);font-weight:700;letter-spacing:2px;font-size:14px;margin-bottom:4px}
@@ -38,7 +45,7 @@ h1{font-size:46px;font-weight:900;text-align:center;line-height:1.05;margin-top:
 .tog.on{color:#fff;background:var(--panel2)}
 
 /* ---------- game ---------- */
-#game{padding:8px 8px 10px}
+#game{padding:calc(8px + env(safe-area-inset-top)) calc(8px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left))}
 .topbar{display:flex;align-items:center;gap:8px}
 .iconbtn{width:50px;height:50px;border-radius:14px;border:none;background:var(--panel);font-size:24px;display:flex;align-items:center;justify-content:center;flex:none}
 .iconbtn:active,.bigbtn:active{transform:scale(.94)}
@@ -177,6 +184,7 @@ const ILLIONS = ['', 'thousand', 'million', 'billion', 'trillion', 'quadrillion'
   'sexdecillion', 'septendecillion', 'octodecillion', 'novemdecillion', 'vigintillion'];
 function sci(v) { // 2 significant digits: [mantissa string, exponent]
   const s = v.toString(), e = s.length - 1;
+  if (/^[1-9]0*$/.test(s)) return [s[0], e];   // exact: 9×10¹⁵ (not 9.0×10¹⁵)
   let m = Math.round(Number(s.slice(0, 3).padEnd(3, '0')) / 10), ee = e;
   if (m >= 100) { m = 10; ee = e + 1; }
   return [(m / 10).toFixed(1), ee];
@@ -185,8 +193,7 @@ function fmt(v) {
   if (v < 0n) return '−' + fmt(-v);
   const s = v.toString();
   if (s.length <= 5) return s;
-  if (isPow10(v)) return '10' + sup(s.length - 1);
-  const [m, e] = sci(v);
+  const [m, e] = sci(v);   // 1×10²⁵ (not 10²⁵) so it lines up with its partner 9×10²⁵
   return `${m}×10${sup(e)}`;
 }
 // Name a number in words: "one tredecillion", "about 1.4 tredecillion", "a googol"
@@ -207,6 +214,8 @@ function nameOf(v, spoken) {
   return spoken ? `about ${m} times ten to the ${ee}` : `about ${m}×10${sup(ee)}`;
 }
 const sayNum = v => nameOf(v, true);
+// Count ZEROS, not digits: a million is "a 1 with 6 zeros".
+const zerosLine = v => { const e = digits(v) - 1; return isPow10(v) ? `a 1 with ${e} zeros` : `bigger than a 1 with ${e} zeros`; };
 
 /* ---------- ladders ---------- */
 const LADDERS = {
@@ -244,7 +253,7 @@ const LADDERS = {
     idx: v => v < 10n ? -1 : digits(v) - 2,
     next: v => v < 10n ? 10n : 10n ** B(digits(v)),
     cap: v => v >= 100n && v < BIG ? '10' + sup(digits(v) - 1) : '',
-    say: v => v >= 100n && v < 1000000n ? `That's ten to the ${digits(v) - 1}.` : ''
+    say: v => v >= 100n && v < 1000000n ? `That's a 1 with ${digits(v) - 1} zeros.` : ''
   }
 };
 
@@ -347,7 +356,15 @@ function spawnValue() {
       return lad.val(lo + pickW([0, 1, 2], [6, 3, 1]));
     }
     if (ld === 'tens') { // number bonds: 3 + 7 = 10, 40 + 60 = 100, 300 + 700 = 1000
-      const E = Math.max(0, topIdx() + 1);
+      const E = digits(G.best) - 1;
+      if (Math.random() < 0.5) { // partner for a tile already on the board (6×10¹¹ → 4×10¹¹, 10¹⁴ → 9×10¹⁴)
+        const lo = 10n ** B(Math.max(0, E - 2));
+        const cands = G.grid.filter(t => t && t.v >= lo);
+        if (cands.length) {
+          const v = cands[Math.floor(Math.random() * cands.length)].v, c = lad.next(v) - v;
+          if (c > 0n) return c;
+        }
+      }
       const e = Math.max(0, E - pickW([0, 1, 2], [3, 2, 1]));
       return B(1 + Math.floor(Math.random() * 9)) * 10n ** B(e);
     }
@@ -402,11 +419,24 @@ function findMove(maxLen = 5) {
   return null;
 }
 
+// In adding mode, tiny tiles can never catch up with big ones, so (like 2248) they get cleared away.
+function staleBelow() {
+  if (store.op !== 'add') return 0n;
+  if (store.ladder === 'tens') { const E = digits(G.best) - 1; return E >= 4 ? 10n ** B(E - 3) : 0n; }
+  if (store.ladder === 'doubling') { const lo = Math.max(0, topIdx() - 5); return lo >= 2 ? L().val(lo - 1) : 0n; }
+  return 0n;
+}
+function plantPair() {
+  if (store.op === 'add' && store.ladder === 'tens') { const p = 10n ** B(Math.max(0, digits(G.best) - 2)); return [3n * p, 7n * p]; }
+  if (store.op === 'add' && store.ladder === 'doubling') { const x = L().val(Math.max(0, topIdx() - 5)); return [x, x]; }
+  return PLANT[store.op][store.ladder].map(B);
+}
 function plant() {
   const a = Math.floor(Math.random() * N), b = NB[a][Math.floor(Math.random() * NB[a].length)];
-  const [x, y] = PLANT[store.op][store.ladder];
-  G.grid[a].v = B(x); G.grid[b].v = B(y);
+  const [x, y] = plantPair();
+  G.grid[a].v = x; G.grid[b].v = y;
 }
+const stats = { autoShuffles: 0, cleared: 0 };
 function shuffleArr(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } }
 function makeSolvable() {
   let tries = 0;
@@ -443,7 +473,6 @@ function makeEl() {
 function tileText(v) {
   const s = v.toString(), isL = L().is(v);
   if (s.length <= 5) return [s, isL ? L().cap(v) : '', false];
-  if (isPow10(v)) { const c = isL ? L().cap(v) : ''; return ['10' + sup(s.length - 1), c.length <= 9 ? c : '', false]; }
   const [m, e] = sci(v);
   return [m, '×10' + sup(e), true];
 }
@@ -526,7 +555,7 @@ function idleGoal() {
   const gv = goalValue();
   if (gv < BIG) return [`Make ${fmt(gv)} ⭐`, 'Slide across tiles that touch'];
   const ge = Math.min(100, digits(G.best));
-  return [`Reach 10${sup(ge)} ⭐`, nameOf(10n ** B(ge))];
+  return [`Reach 10${sup(ge)} ⭐`, (ge < 66 ? nameOf(10n ** B(ge)) + ' · ' : '') + `a 1 with ${ge} zeros`];
 }
 function showEq() {
   if (!chain.length) {
@@ -733,7 +762,7 @@ async function merge(path, vals, res) {
   let speech = small ? vals.map(String).join(` ${O().word} `) + ` equals ${res}.` : `${sayNum(res)}!`;
   if (party && party.kind === 'step') speech += ` Wow! You made ${res}! ` + L().say(res);
   if (party && (party.kind === 'name' || party.kind === 'power'))
-    speech = `Wow! You made ${sayNum(res)}! That number has ${digits(res)} digits!`;
+    speech = `Wow! You made ${sayNum(res)}! That's ${zerosLine(res)}!`;
   if (party && party.kind === 'googol') speech = `A googol! That's a one with a hundred zeros! You reached the top!`;
   say(speech);
   drawChain();
@@ -758,6 +787,18 @@ async function merge(path, vals, res) {
     await sleep(300);
     G.grid[last] = null;
   }
+  const floor = staleBelow();
+  if (floor) {
+    const stale = [];
+    G.grid.forEach((t, i) => { if (t && t.v < floor) stale.push(i); });
+    if (stale.length) {
+      stats.cleared += stale.length;
+      for (const i of stale) { const [r, c] = rc(i), el = tiles.get(G.grid[i].id); posEl(el, r, c, 0.2); el.style.opacity = '0'; }
+      tone(880, 0.12, 'sine', 0.08); tone(1320, 0.12, 'sine', 0.06, 0.06);
+      await sleep(260);
+      stale.forEach(i => { G.grid[i] = null; });
+    }
+  }
   gravity(); render();
   await sleep(320);
   updateHUD();
@@ -767,13 +808,14 @@ async function merge(path, vals, res) {
     toast(`You made ${fmt(res)}!`, cap ? `${cap} = ${fmt(res)}` : '⭐', 1700);
   } else if (party && party.kind === 'name') {
     confetti(90); sfxStar();
-    toast(`${party.word.toUpperCase()}!`, `${fmt(res)} = ${nameOf(res)}`, 2600);
+    toast(`${party.word.toUpperCase()}!`, `${fmt(res)} = ${zerosLine(res)}!`, 2600);
   } else if (party && party.kind === 'power') {
     confetti(90); sfxStar();
-    toast(`10${sup(party.e)}!`, `${digits(res)} digits long!`, 2400);
+    toast(`10${sup(party.e)}!`, `That's ${zerosLine(res)}!`, 2400);
   }
   if (!findMove()) {
     await sleep(party ? 1400 : 300);
+    stats.autoShuffles++;
     toast('No moves!', 'Shuffling…', 1200);
     await sleep(500);
     await shuffleBoard(true);
@@ -915,7 +957,7 @@ window.onAndroidBack = function () {
 
 buildMenu();
 // debug hooks for automated tests
-window.__mm = { get G() { return G; }, findMove, valid, O, L, store, startGame, fmt, nameOf, iroot, celebration, updateHUD, render,
+window.__mm = { stats, staleBelow, get G() { return G; }, findMove, valid, O, L, store, startGame, fmt, nameOf, iroot, celebration, updateHUD, render,
   get busy() { return busy; }, get cell() { return cell; } };
 </script>
 </body>

@@ -32,6 +32,11 @@ Push to `main` and GitHub Actions builds the APK automatically:
   `MathMerge.apk` on the phone to install.
 - Or **Actions** tab → latest run → `MathMerge-apk` artifact (a zip).
 
+**Web version (iPhones, any browser):** one-time, go to the repo's
+Settings → Pages → Source: **GitHub Actions**. After that, every push also
+publishes the game to `https://<your-username>.github.io/<repo-name>/`.
+On an iPhone, open it in Safari → Share → **Add to Home Screen** for an app icon.
+
 `app/mathmerge.keystore` is the signing key. Keep it in the repo so new
 builds install over old ones without losing saved games.
 
