@@ -2,6 +2,8 @@ package com.slettis.mathmerge;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -15,6 +17,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Locale;
 
 public class MainActivity extends Activity implements TextToSpeech.OnInitListener {
@@ -73,6 +82,69 @@ public class MainActivity extends Activity implements TextToSpeech.OnInitListene
     }
 
     private class Bridge {
+        @JavascriptInterface
+        public int buildNumber() {
+            return BuildConfig.VERSION_CODE;
+        }
+
+        // Asks GitHub for the newest release; answers via window.onUpdateInfo({build, url}) or null.
+        @JavascriptInterface
+        public void checkUpdate() {
+            if (BuildConfig.REPO == null || BuildConfig.REPO.isEmpty()) return;
+            new Thread(() -> {
+                String result = "null";
+                try {
+                    URL u = new URL("https://api.github.com/repos/" + BuildConfig.REPO + "/releases/latest");
+                    HttpURLConnection c = (HttpURLConnection) u.openConnection();
+                    c.setRequestProperty("Accept", "application/vnd.github+json");
+                    c.setConnectTimeout(8000);
+                    c.setReadTimeout(8000);
+                    if (c.getResponseCode() == 200) {
+                        StringBuilder sb = new StringBuilder();
+                        try (BufferedReader r = new BufferedReader(new InputStreamReader(c.getInputStream()))) {
+                            String line;
+                            while ((line = r.readLine()) != null) sb.append(line);
+                        }
+                        JSONObject j = new JSONObject(sb.toString());
+                        String tag = j.optString("tag_name", "");
+                        int build = Integer.parseInt(tag.replaceAll("[^0-9]", ""));
+                        String url = j.optString("html_url", "");
+                        JSONArray assets = j.optJSONArray("assets");
+                        if (assets != null) {
+                            for (int i = 0; i < assets.length(); i++) {
+                                JSONObject a = assets.getJSONObject(i);
+                                if (a.optString("name", "").endsWith(".apk")) {
+                                    url = a.optString("browser_download_url", url);
+                                    break;
+                                }
+                            }
+                        }
+                        JSONObject out = new JSONObject();
+                        out.put("build", build);
+                        out.put("url", url);
+                        result = out.toString();
+                    }
+                    c.disconnect();
+                } catch (Exception ignored) {
+                }
+                final String r = result;
+                runOnUiThread(() -> {
+                    if (web != null) web.evaluateJavascript("window.onUpdateInfo && window.onUpdateInfo(" + r + ")", null);
+                });
+            }).start();
+        }
+
+        // Opens the APK link in the browser, which downloads it; tapping it then offers "Update".
+        @JavascriptInterface
+        public void openUrl(String url) {
+            runOnUiThread(() -> {
+                try {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                } catch (Exception ignored) {
+                }
+            });
+        }
+
         @JavascriptInterface
         public void speak(String text) {
             if (ttsReady && tts != null) {

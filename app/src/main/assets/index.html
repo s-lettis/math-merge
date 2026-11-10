@@ -41,6 +41,8 @@ h1{font-size:46px;font-weight:900;text-align:center;line-height:1.05;margin-top:
 #playBtn{font-size:30px;font-weight:900;color:#2b1d00;background:linear-gradient(180deg,#ffd84d,#ffaa00);border:none;border-radius:20px;padding:14px;box-shadow:0 6px 0 #b06e00}
 #playBtn:active{transform:translateY(4px);box-shadow:0 2px 0 #b06e00}
 .toggles{display:flex;gap:10px;margin-top:6px}
+#updateBtn{font-size:18px;font-weight:900;color:#06281b;background:linear-gradient(180deg,#5cf2b4,#22c98a);border:none;border-radius:16px;padding:12px;box-shadow:0 4px 0 #128a5c}
+.buildno{text-align:center;color:#5d6280;font-size:12px;font-weight:700;margin-top:4px}
 .tog{flex:1;background:var(--panel);border:none;border-radius:14px;padding:12px 6px;font-size:14px;font-weight:800;color:var(--muted)}
 .tog.on{color:#fff;background:var(--panel2)}
 
@@ -69,6 +71,7 @@ h1{font-size:46px;font-weight:900;text-align:center;line-height:1.05;margin-top:
 .face b{line-height:1;font-weight:900}
 .face i{font-style:normal;font-weight:800;opacity:.8;line-height:1;margin-top:3px}
 .face.helper{box-shadow:inset 0 -5px 0 rgba(0,0,0,.25),inset 0 0 0 2px rgba(255,255,255,.12)}
+.face.lad{box-shadow:inset 0 0 0 3px rgba(255,255,255,.95),inset 0 -5px 0 rgba(0,0,0,.22)}
 .face.sel{box-shadow:0 0 0 4px #fff,inset 0 -5px 0 rgba(0,0,0,.22)}
 .face.pop{animation:pop .36s ease}
 .face.wob{animation:wob .38s}
@@ -79,11 +82,69 @@ h1{font-size:46px;font-weight:900;text-align:center;line-height:1.05;margin-top:
 .bottombar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;flex:none}
 .bigbtn{background:var(--panel);border:none;border-radius:16px;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:24px;line-height:1}
 .bigbtn span{font-size:12px;font-weight:800;color:var(--muted);margin-top:4px}
-#toast{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%) scale(.6);opacity:0;pointer-events:none;z-index:20;
+#toast{position:fixed;left:50%;top:38%;transform:translate(-50%,-50%) scale(.6);opacity:0;pointer-events:none;z-index:20;
   background:rgba(20,20,31,.92);border:3px solid var(--gold);border-radius:22px;padding:14px 22px;text-align:center;transition:all .25s cubic-bezier(.34,1.4,.64,1);min-width:220px}
 #toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 #toast .t1{font-size:30px;font-weight:900;color:var(--gold)}
 #toast .t2{font-size:17px;font-weight:800;color:#fff;margin-top:4px}
+
+/* ---------- learn screens ---------- */
+#learn{padding:calc(8px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));gap:10px}
+.starpill{height:50px;padding:0 12px;border-radius:14px;background:var(--panel);display:flex;align-items:center;font-weight:900;font-size:18px;color:var(--gold);flex:none}
+.stages{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.stg{height:36px;padding:0 10px;border-radius:10px;border:2px solid transparent;background:var(--panel);color:var(--muted);font-weight:800;font-size:13px}
+.stg.done{color:var(--good)}
+.stg.now{border:2px dashed var(--gold);color:var(--gold);background:transparent}
+.lbody{flex:1;display:flex;flex-direction:column;gap:10px;min-height:0;overflow-y:auto}
+.lcard{background:var(--panel);border-radius:22px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.lq{font-size:21px;font-weight:900;text-align:center}
+.lsub{font-size:15px;font-weight:800;color:var(--muted)}
+.lcap{font-size:14px;font-weight:700;color:var(--muted);text-align:center;min-height:17px}
+.lbig{font-weight:900;line-height:1;white-space:nowrap}
+.lfound{font-size:16px;font-weight:900;color:var(--gold);text-align:center}
+.chs{display:grid;gap:10px}
+.chs.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ch{min-height:62px;border-radius:18px;border:3px solid transparent;background:var(--panel);font-weight:900;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px;gap:4px;white-space:nowrap}
+.ch.pic{min-height:150px}
+.ch.right{border-color:var(--good);background:#11382b}
+.ch.wrong{border-color:var(--bad);background:#3a1520;opacity:.75}
+.ch.dim{opacity:.25}
+.ch.hl{border-color:var(--gold);animation:pulse 1s ease-in-out infinite}
+.pcap{font-size:12px;font-weight:800;color:var(--muted)}
+.lsteps{display:flex;align-items:center;gap:6px}
+.lstep{flex:1;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;background:var(--panel);color:#5d6280;border:3px solid transparent}
+.lstep.done{background:#11382b;border-color:var(--good);color:#fff}
+.lstep.now{background:transparent;border:3px dashed var(--gold);color:var(--gold);font-size:15px}
+.larr{color:#5d6280;font-weight:900;font-size:22px}
+.nmain{font-size:30px;font-weight:900;line-height:1.1}
+.nsub{font-size:15px;font-weight:800;color:var(--muted);white-space:normal;text-align:center}
+.celebrate{display:flex;align-items:center;justify-content:center;gap:12px;animation:pop .55s ease;min-height:46px}
+.praise{font-size:34px;font-weight:900;color:var(--gold)}
+.plus{font-size:20px;font-weight:900;color:var(--gold);background:var(--panel2);border-radius:12px;padding:5px 10px;animation:pulse 1s ease-in-out 2}
+.xcard{gap:8px}
+.xtitle{font-size:26px;font-weight:900;color:var(--good)}
+.xsteps{display:flex;flex-direction:column;gap:6px;align-items:center;width:100%}
+.xstep{opacity:0;font-size:18px;font-weight:800;text-align:center;line-height:1.3;animation:stepIn .45s ease forwards}
+.xstep.big{font-size:26px;font-weight:900;color:#fff;background:#11382b;border:2px solid var(--good);border-radius:14px;padding:6px 14px}
+@keyframes stepIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.nextbtn{opacity:0;animation:stepIn .4s ease forwards;flex:none;height:62px;border:none;border-radius:20px;background:linear-gradient(180deg,#ffd84d,#ffaa00);color:#2b1d00;font-size:26px;font-weight:900;box-shadow:0 6px 0 #b06e00}
+.nextbtn:active{transform:translateY(4px);box-shadow:0 2px 0 #b06e00}
+.lfb.bad{background:#3a1520;border-color:var(--bad)}
+.lfb{background:#11382b;border:2px solid var(--good);border-radius:18px;padding:12px 14px;font-size:16px;font-weight:800;line-height:1.35}
+.ruled{display:grid;grid-template-columns:auto auto;gap:6px;align-items:center}
+.rtop{position:relative;height:26px;display:flex;align-items:center;justify-content:center}
+.rtop::before{content:'';position:absolute;left:0;right:0;top:50%;border-top:2px solid #9aa0b8}
+.rtop::after{content:'';position:absolute;left:0;right:0;top:4px;bottom:4px;border-left:2px solid #9aa0b8;border-right:2px solid #9aa0b8}
+.rleft{position:relative;align-self:stretch;display:flex;align-items:center;justify-content:center;min-width:34px}
+.rleft::before{content:'';position:absolute;top:0;bottom:0;left:50%;border-left:2px solid #9aa0b8}
+.rleft::after{content:'';position:absolute;top:0;bottom:0;left:25%;right:25%;border-top:2px solid #9aa0b8;border-bottom:2px solid #9aa0b8}
+.rtop span,.rleft span{position:relative;z-index:1;background:var(--panel);padding:2px 5px;font-size:19px;font-weight:900;color:#fff;line-height:1}
+.dots{display:grid}
+.dots i{display:block;border-radius:30%}
+.blocks{display:grid}
+.blocks div{border-radius:14%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#06203f;background:#3a86ff;box-shadow:inset 0 0 0 2px #a9cbff}
+.bottombar.two{grid-template-columns:repeat(2,1fr)}
+.op .desc{font-size:11px;color:var(--muted);font-weight:700;line-height:1.2}
 
 /* ---------- overlay ---------- */
 .overlay{position:absolute;inset:0;background:rgba(8,8,14,.75);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
@@ -111,12 +172,16 @@ h1{font-size:46px;font-weight:900;text-align:center;line-height:1.05;margin-top:
   <div class="choices" id="ladderChoices"></div>
   <div class="section-title">2. Pick your math</div>
   <div class="choices ops" id="opChoices"></div>
+  <div class="section-title" id="learnTitle">…or learn the shape</div>
+  <div class="choices ops" id="learnChoices"></div>
   <div class="bestline" id="bestLine"></div>
+  <button id="updateBtn" style="display:none"></button>
   <button id="playBtn">Play</button>
   <div class="toggles">
     <button class="tog" id="togVoice"></button>
     <button class="tog" id="togSound"></button>
   </div>
+  <div class="buildno" id="buildNo"></div>
 </div>
 
 <div id="game" class="screen">
@@ -134,9 +199,22 @@ h1{font-size:46px;font-weight:900;text-align:center;line-height:1.05;margin-top:
     <button class="bigbtn" id="helpBtn">❓<span>How to</span></button>
     <button class="bigbtn" id="newBtn">🔄<span>New game</span></button>
   </div>
-  <div id="toast"><div class="t1"></div><div class="t2"></div></div>
 </div>
 
+<div id="learn" class="screen">
+  <div class="topbar">
+    <button class="iconbtn" id="lHome" aria-label="Home">🏠</button>
+    <div class="modeLabel" id="lLabel"></div>
+    <div class="starpill" id="lStars"></div>
+  </div>
+  <div class="stages" id="lStages"></div>
+  <div class="lbody" id="lBody"></div>
+  <div class="bottombar two">
+    <button class="bigbtn" id="lHint">💡<span>Hint</span></button>
+    <button class="bigbtn" id="lSay">🔊<span>Say it</span></button>
+  </div>
+</div>
+<div id="toast"><div class="t1"></div><div class="t2"></div></div>
 <div class="overlay" id="overlay"><div class="card" id="card"></div></div>
 <div id="fx"></div>
 
@@ -270,10 +348,10 @@ const PLANT = {
   mul: { doubling: [2, 2], squares: [2, 2], cubes: [2, 4], tens: [2, 5] }
 };
 const EXAMPLES = {
-  doubling: { add: ['2 + 2 = 4', '4 + 4 = 8', '2 + 2 + 4 = 8'], sub: ['3 − 1 = 2', '6 − 2 = 4', '16 − 8 = 8'], mul: ['2 × 2 = 4', '2 × 4 = 8', '64 × 64 = 4096'] },
-  squares:  { add: ['1 + 3 = 4', '4 + 5 = 9', '9 + 7 = 16'], sub: ['5 − 1 = 4', '10 − 1 = 9', '25 − 9 = 16'], mul: ['2 × 2 = 4', '3 × 3 = 9', '4 × 9 = 36'] },
-  cubes:    { add: ['1 + 7 = 8', '4 + 4 = 8', '8 + 19 = 27'], sub: ['9 − 1 = 8', '10 − 2 = 8', '29 − 2 = 27'], mul: ['2 × 2 × 2 = 8', '2 × 4 = 8', '8 × 8 = 64'] },
-  tens:     { add: ['3 + 7 = 10', '40 + 60 = 100', '10 + 90 = 100'], sub: ['12 − 2 = 10', '103 − 3 = 100', '1001 − 1 = 1000'], mul: ['2 × 5 = 10', '10 × 10 = 100', '10³ × 10⁴ = 10⁷'] }
+  doubling: { add: ['2 + 2 = 4', '4 + 4 = 8', '2 + 2 + 4 = 8'], sub: ['3 − 1 = 2', '6 − 2 = 4', '16 − 8 = 8'], mul: ['2 × 2 = 4', '4 × 2 = 8', '16 × 2 = 32'] },
+  squares:  { add: ['1 + 3 = 4', '4 + 5 = 9', '9 + 7 = 16'], sub: ['5 − 1 = 4', '10 − 1 = 9', '25 − 9 = 16'], mul: ['2 × 2 = 4', '3 × 3 = 9', '6 × 6 = 36'] },
+  cubes:    { add: ['1 + 7 = 8', '4 + 4 = 8', '8 + 19 = 27'], sub: ['9 − 1 = 8', '10 − 2 = 8', '29 − 2 = 27'], mul: ['2 × 2 × 2 = 8', '3 × 3 × 3 = 27', '4 × 4 × 4 = 64'] },
+  tens:     { add: ['3 + 7 = 10', '40 + 60 = 100', '10 + 90 = 100'], sub: ['12 − 2 = 10', '103 − 3 = 100', '1001 − 1 = 1000'], mul: ['2 × 5 = 10', '10 × 10 = 100', '10⁵ × 10 = 10⁶'] }
 };
 
 /* ---------------- storage ---------------- */
@@ -299,22 +377,46 @@ function lightColor(hex) {
 }
 const pal = i => PALETTE[((i % PALETTE.length) + PALETTE.length) % PALETTE.length];
 // Small numbers: color by ladder step. Big numbers: color by how many digits (each 10ⁿ its own color).
-const colorIdx = v => v < 1000000n ? L().idx(v) : digits(v) + 3;
-const colorFor = v => L().is(v) ? pal(colorIdx(v)) : HELPER;
+// Big numbers (and everything in Tens) are colored by their power of ten,
+// so 2×10³⁹, 8×10³⁹ and 1×10³⁹ all match. Small numbers: ladder numbers bright, helpers grey.
+const powColor = e => pal(e + 4);
+const byPower = v => store.ladder === 'tens' || v >= BIG;
+const colorFor = v => byPower(v) ? powColor(digits(v) - 1) : L().is(v) ? pal(L().idx(v)) : HELPER;
 const textOn = col => lightColor(col) ? '#2b1d00' : '#fff';
-// Take-away on squares/cubes starts at 4 / 8 (otherwise it's endless 2 − 1 = 1).
-const minIdx = () => (store.op === 'sub' && (store.ladder === 'squares' || store.ladder === 'cubes')) ? 1 : 0;
+// Squares/cubes start at 4 / 8: you can't make 1 by adding or multiplying, and taking away to 1 is no fun.
+const minIdx = () => (store.ladder === 'squares' || store.ladder === 'cubes') ? 1 : 0;
 const minVal = () => L().val(minIdx());
-const valid = res => res >= minVal() && L().is(res);
+// No skipping: a merge can't jump past the next goal. (The true doubling chain is exempt: it is already step by step.)
+const tooFar = res => !strictDoubling() && !!G && res > goalValue();
+const valid = res => res >= minVal() && L().is(res) && !tooFar(res);
 function whyNot(res) {
   if (res < 1n) return 'Too much taken away';
   if (!L().is(res)) return `${fmt(res)} is not a ${L().kind}`;
+  if (tooFar(res)) return `Too big a jump! Make ${fmt(goalValue())} first`;
   return `Make ${fmt(minVal())} or bigger`;
 }
 function whyNotSpoken(res) {
   if (res < 1n) return 'Oops! Too much taken away';
   if (!L().is(res)) return `${sayNum(res)} is not a ${L().kind}`;
+  if (tooFar(res)) return `Too big a jump! Make ${sayNum(goalValue())} first`;
   return `Make ${sayNum(minVal())} or bigger`;
+}
+// Doubling · Adding uses the true doubling rule: two equal tiles, then each next tile = the total so far.
+// 8 + 8 + 16 + 32 works; 8 + 8 + 16 + 16 does not.
+const strictDoubling = () => store.ladder === 'doubling' && store.op === 'add';
+// Times modes follow the shape being taught: squares = 2 of the same, cubes = 3 of the same,
+// doubling/tens = exactly 2 tiles (16 × 2, 10⁵ × 10).
+const sameN = () => store.op === 'mul' ? (store.ladder === 'squares' ? 2 : store.ladder === 'cubes' ? 3 : 0) : 0;
+const pairOnly = () => store.op === 'mul' && (store.ladder === 'doubling' || store.ladder === 'tens');
+function canExtend(vals, v) {
+  if (strictDoubling()) {
+    if (vals.length === 1) return v === vals[0];
+    return v === vals.reduce((a, b) => a + b, 0n);
+  }
+  const n = sameN();
+  if (n) return vals.length < n && v === vals[0];
+  if (pairOnly()) return vals.length < 2;
+  return true;
 }
 const rc = i => [Math.floor(i / COLS), i % COLS];
 const NB = [];
@@ -343,7 +445,9 @@ function boardMax() {
   return m;
 }
 const topIdx = () => { const m = boardMax(); return m ? L().idx(m) : -1; };
-const goalValue = () => { const v = L().next(G.best); return v < minVal() ? minVal() : v; };
+// first goal: the smallest number the mode can actually make (Doubling · Times starts at 2 × 2 = 4)
+const firstGoal = () => store.op === 'mul' && store.ladder === 'doubling' ? 4n : minVal();
+const goalValue = () => { const v = L().next(G.best); return v < firstGoal() ? firstGoal() : v; };
 const goalIdx = () => L().idx(goalValue());
 
 // What number appears in a new tile. Tuned per level + math so there are always things to make.
@@ -375,14 +479,24 @@ function spawnValue() {
     }
     return lad.val(pickW([0, 1, 2], [5, 3, 2]));
   }
-  if (store.op === 'mul') {
+  if (store.op === 'mul') {   // tiles aimed at the next step up the ladder
+    const g = goalValue();
     if (ld === 'doubling') {
-      const lo = Math.max(0, Math.floor(top / 5));   // grows slowly, so a googol takes a while
-      return lad.val(lo + pickW([0, 1, 2], [6, 3, 1]));
+      if (r < 0.45) return 2n;
+      if (r < 0.6) return 4n;
+      const hi = Math.max(0, lad.idx(g / 2n));
+      return lad.val(Math.max(0, hi - pickW([0, 1, 2], [3, 2, 1])));
     }
-    if (ld === 'squares') return B(r < 0.85 ? pickW([2, 3, 4, 5, 6, 7], [10, 10, 4, 3, 1, 1]) : pickW([4, 9], [2, 1]));
-    if (ld === 'tens') return B(pickW([2, 5, 10, 100, 4, 25, 1000], [3, 3, 6, 2, 1, 1, 1]));
-    return B(r < 0.9 ? pickW([2, 3, 4, 5], [10, 7, 3, 1]) : 8);
+    if (ld === 'tens') {
+      if (r < 0.4) return 10n;
+      if (r < 0.6) return B(pickW([2, 5, 4, 25], [3, 3, 1, 1]));
+      const hi = Math.max(0, lad.idx(g / 10n));
+      return lad.val(Math.max(0, hi - pickW([0, 1, 2], [3, 2, 1])));
+    }
+    const rt = Math.max(2, Number(iroot(g, ld === 'squares' ? 2 : 3)));
+    if (r < 0.45) return B(rt);
+    if (r < 0.65) return B(Math.max(2, rt - 1));
+    return B(2 + Math.floor(Math.random() * (rt - 1)));
   }
   // take away: small numbers, plus "ladder number + a little" so the kid can take the little bit away
   const g = goalIdx();
@@ -404,6 +518,7 @@ function findMove(maxLen = 5) {
     const last = path[path.length - 1];
     for (const n of NB[last]) {
       if (path.includes(n)) continue;
+      if (!canExtend(path.map(i => G.grid[i].v), G.grid[n].v)) continue;
       path.push(n);
       if (dfs(len)) return true;
       path.pop();
@@ -427,14 +542,22 @@ function staleBelow() {
   return 0n;
 }
 function plantPair() {
+  if (store.op === 'mul') {
+    const g = goalValue();
+    if (store.ladder === 'doubling') return g >= 4n ? [g / 2n, 2n] : [2n, 2n];
+    if (store.ladder === 'tens') return g >= 100n ? [g / 10n, 10n] : [2n, 5n];
+    const rt = iroot(g, store.ladder === 'squares' ? 2 : 3);
+    return store.ladder === 'squares' ? [rt, rt] : [rt, rt, rt];
+  }
   if (store.op === 'add' && store.ladder === 'tens') { const p = 10n ** B(Math.max(0, digits(G.best) - 2)); return [3n * p, 7n * p]; }
   if (store.op === 'add' && store.ladder === 'doubling') { const x = L().val(Math.max(0, topIdx() - 5)); return [x, x]; }
   return PLANT[store.op][store.ladder].map(B);
 }
 function plant() {
   const a = Math.floor(Math.random() * N), b = NB[a][Math.floor(Math.random() * NB[a].length)];
-  const [x, y] = plantPair();
+  const [x, y, z] = plantPair();
   G.grid[a].v = x; G.grid[b].v = y;
+  if (z !== undefined) { const c = NB[b].find(n => n !== a); G.grid[c].v = z; }
 }
 const stats = { autoShuffles: 0, cleared: 0 };
 function shuffleArr(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } }
@@ -481,10 +604,11 @@ function paintEl(el, v) {
   el._v = v;
   const size = cell - 2 * gap, face = el.firstChild, isL = L().is(v);
   el.style.width = el.style.height = size + 'px';
-  const col = isL ? pal(colorIdx(v)) : HELPER;
+  const col = colorFor(v), plain = col === HELPER;
   face.style.background = col;
-  face.style.color = isL ? textOn(col) : '#dfe5ff';
-  face.classList.toggle('helper', !isL);
+  face.style.color = plain ? '#dfe5ff' : textOn(col);
+  face.classList.toggle('helper', plain);
+  face.classList.toggle('lad', isL && byPower(v));   // the 1×10ⁿ you're building: white outline
   const [txt, cap, sciCap] = tileText(v);
   const scale = [0, 0.5, 0.45, 0.36, 0.29, 0.24, 0.21][Math.min(txt.length, 6)];
   face.firstChild.textContent = txt;
@@ -538,7 +662,9 @@ function drawChain() {
 }
 const chainVals = () => chain.map(i => G.grid[i].v);
 const chainResult = () => O().apply(chainVals());
+const allSame = vals => vals.every(v => v === vals[0]);
 function eqString(vals, res) {
+  if (store.op === 'add' && vals.length > 3 && allSame(vals)) return `${vals.length} × ${fmt(vals[0])} = ${fmt(res)}`;
   let s = vals.map(fmt).join(` ${O().sym} `);
   if (vals.length >= 2) s += ` = ${fmt(res)}`;
   return s;
@@ -565,9 +691,15 @@ function showEq() {
     return;
   }
   const vals = chainVals();
-  if (vals.length < 2) { setEq(fmt(vals[0]), '', `Now slide to a touching tile`); return; }
+  if (vals.length < 2) {
+    const v0 = fmt(vals[0]);
+    setEq(v0, '', strictDoubling() || sameN() === 2 ? `Find another ${v0}` : sameN() === 3 ? `Find two more ${v0}s` : pairOnly() ? 'Now pick one more tile' : `Now slide to a touching tile`);
+    return;
+  }
+  if (sameN() === 3 && vals.length === 2) { setEq(eqString(vals, O().apply(vals)), '', `One more ${fmt(vals[0])} makes a cube!`); return; }
   const res = O().apply(vals), ok = valid(res);
-  setEq(eqString(vals, res), ok ? 'good' : 'bad', ok ? `${fmt(res)} is a ${L().kind}! Let go!` : whyNot(res));
+  const note = ok ? (strictDoubling() ? `Let go — or double again with a ${fmt(res)}` : `${fmt(res)} is a ${L().kind}! Let go!`) : whyNot(res);
+  setEq(eqString(vals, res), ok ? 'good' : 'bad', note);
 }
 function updateHUD() {
   const lad = L(), gv = goalValue();
@@ -578,7 +710,7 @@ function updateHUD() {
     const g = lad.idx(gv), from = Math.max(minIdx(), g - 2), to = from + 4;
     for (let i = from; i <= to; i++) {
       const v = lad.val(i), txt = fmt(v);
-      if (v <= G.best) h += chip(txt, '', pal(colorIdx(v)));
+      if (v <= G.best) h += chip(txt, '', colorFor(v));
       else if (i === g) h += chip(txt, 'goal');
       else h += chip(txt, '');
       if (i < to) h += '<span class="arrow">›</span>';
@@ -683,8 +815,16 @@ function handlePoint(p) {
   const pos = chain.indexOf(i);
   if (pos === chain.length - 1) return;
   if (pos >= 0 && pos === chain.length - 2) { chain.pop(); sfxStep(chain.length - 1); chainChanged(); return; }
-  if (pos === -1 && adjacent(i, chain[chain.length - 1])) { chain.push(i); sfxStep(chain.length - 1); chainChanged(); }
+  if (pos === -1 && adjacent(i, chain[chain.length - 1])) {
+    if (!canExtend(chainVals(), G.grid[i].v)) {   // not the next doubling: tile wobbles, chain doesn't grow
+      if (lastBlocked !== i) { lastBlocked = i; retrigger(tiles.get(G.grid[i].id).firstChild, 'wob'); tone(200, 0.08, 'square', 0.03); }
+      return;
+    }
+    lastBlocked = -1;
+    chain.push(i); sfxStep(chain.length - 1); chainChanged();
+  }
 }
+let lastBlocked = -1;
 board.addEventListener('pointerdown', e => {
   if (busy || chain.length) return;
   audio();
@@ -693,7 +833,7 @@ board.addEventListener('pointerdown', e => {
   try { board.setPointerCapture(e.pointerId); } catch (_) {}
   clearHint();
   eqHoldUntil = 0;
-  chain = [i]; lastPt = p;
+  chain = [i]; lastPt = p; lastBlocked = -1;
   sfxStep(0); chainChanged();
 });
 board.addEventListener('pointermove', e => {
@@ -722,6 +862,21 @@ function finishChain() {
   path.forEach(i => retrigger(tiles.get(G.grid[i].id).firstChild, 'wob'));
   sfxBad();
   say(whyNotSpoken(res) + '. Try again.');
+}
+
+// Long chains get a short summary instead of "1 plus 1 plus 1 plus…"
+const COUNT_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen'];
+const UNIT_NAMES = { '1': 'ones', '10': 'tens', '100': 'hundreds', '1000': 'thousands' };
+function longChainSpeech(vals, res) {
+  const n = vals.length, cw = COUNT_WORDS[n] || String(n), Cw = cw[0].toUpperCase() + cw.slice(1);
+  if (allSame(vals)) {
+    if (store.op === 'add') {
+      const unit = UNIT_NAMES[vals[0].toString()];
+      return unit ? `${Cw} ${unit} make ${sayNum(res)}.` : `${Cw} times ${sayNum(vals[0])} makes ${sayNum(res)}.`;
+    }
+    if (store.op === 'mul') return `${sayNum(vals[0])}, ${n} times over, makes ${sayNum(res)}.`;
+  }
+  return `That makes ${sayNum(res)}!`;
 }
 
 function gravity() {
@@ -759,7 +914,8 @@ async function merge(path, vals, res) {
   setTimeout(showEq, 1550);
   sfxMerge(); buzz(25);
   const small = res < 1000000n && vals.every(v => v < 1000000n);
-  let speech = small ? vals.map(String).join(` ${O().word} `) + ` equals ${res}.` : `${sayNum(res)}!`;
+  let speech = vals.length > 3 ? longChainSpeech(vals, res)
+    : small ? vals.map(String).join(` ${O().word} `) + ` equals ${res}.` : `${sayNum(res)}!`;
   if (party && party.kind === 'step') speech += ` Wow! You made ${res}! ` + L().say(res);
   if (party && (party.kind === 'name' || party.kind === 'power'))
     speech = `Wow! You made ${sayNum(res)}! That's ${zerosLine(res)}!`;
@@ -777,6 +933,15 @@ async function merge(path, vals, res) {
   render();
   retrigger(tiles.get(G.grid[last].id).firstChild, 'pop');
   await sleep(150);
+  if (sameN() && !(party && party.kind === 'googol')) {
+    await sleep(380);
+    const el = tiles.get(G.grid[last].id);
+    el.style.transition = 'transform .45s ease-in, opacity .45s';
+    posEl(el, -2, lc, 0.5); el.style.opacity = '0';
+    tone(1046, 0.1, 'sine', 0.08);
+    await sleep(380);
+    G.grid[last] = null;
+  }
   if (party && party.kind === 'googol') {
     store.trophies[modeKey()] = (store.trophies[modeKey()] || 0) + 1;
     confetti(120); sfxStar();
@@ -883,7 +1048,7 @@ function startGame(fresh) {
 }
 function goMenu() {
   if (G) save();
-  G = null; clearBoardEls(); chain = [];
+  G = null; LQ = null; clearBoardEls(); chain = [];
   buildMenu(); showScreen('menu');
 }
 
@@ -924,19 +1089,30 @@ function buildMenu() {
     }).join('');
     return `<button class="choice ${store.ladder === k ? 'sel' : ''}" data-l="${k}"><div><div class="big">${lad.title}</div><div class="small">${lad.blurb}</div></div><div class="chips">${chips}</div></button>`;
   }).join('');
+  if (isLearn(store.op) && !STAGES[store.ladder]) store.op = 'add';   // learn modes are squares/cubes only
   $('#opChoices').innerHTML = Object.entries(OPS).map(([k, op]) =>
     `<button class="choice op ${store.op === k ? 'sel' : ''}" data-o="${k}"><div class="sym">${op.sym}</div><div class="name">${op.title}</div><div class="lvl">${op.level}</div></button>`).join('');
+  const canLearn = !!STAGES[store.ladder];
+  $('#learnTitle').style.display = $('#learnChoices').style.display = canLearn ? '' : 'none';
+  $('#learnChoices').innerHTML = canLearn ? Object.entries(LEARN).map(([k, m]) =>
+    `<button class="choice op ${store.op === k ? 'sel' : ''}" data-o="${k}"><div class="name" style="font-size:17px">${m.title}</div><div class="desc">${m.desc}</div></button>`).join('') : '';
   document.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { store.ladder = b.dataset.l; persist(); buildMenu(); tone(660, 0.07); });
   document.querySelectorAll('[data-o]').forEach(b => b.onclick = () => { store.op = b.dataset.o; persist(); buildMenu(); tone(660, 0.07); });
-  const best = store.best[modeKey()], saved = store.games[modeKey()], tro = store.trophies[modeKey()] || 0;
-  $('#bestLine').textContent = (best ? `Best in ${L().title} · ${O().title}: ${fmt(B(best))} ⭐` : `${L().title} · ${O().title}`) + (tro ? `  ·  🏆×${tro}` : '');
-  $('#playBtn').textContent = saved ? 'Continue ▶' : 'Play ▶';
+  if (isLearn(store.op)) {
+    const ls = (store.learn2 || {})[modeKey()];
+    $('#bestLine').textContent = `${L().title} · ${LEARN[store.op].title}` + (ls ? `  ·  ★ ${ls.stars}` : '');
+    $('#playBtn').textContent = 'Learn ▶';
+  } else {
+    const best = store.best[modeKey()], saved = store.games[modeKey()], tro = store.trophies[modeKey()] || 0;
+    $('#bestLine').textContent = (best ? `Best in ${L().title} · ${O().title}: ${fmt(B(best))} ⭐` : `${L().title} · ${O().title}`) + (tro ? `  ·  🏆×${tro}` : '');
+    $('#playBtn').textContent = saved ? 'Continue ▶' : 'Play ▶';
+  }
   $('#togVoice').textContent = `🗣️ Read math out loud: ${store.voice ? 'On' : 'Off'}`;
   $('#togVoice').classList.toggle('on', store.voice);
   $('#togSound').textContent = `🎵 Sounds: ${store.sound ? 'On' : 'Off'}`;
   $('#togSound').classList.toggle('on', store.sound);
 }
-$('#playBtn').onclick = () => { audio(); startGame(false); };
+$('#playBtn').onclick = () => { audio(); if (isLearn(store.op)) startLearn(); else startGame(false); };
 $('#togVoice').onclick = () => { store.voice = !store.voice; persist(); buildMenu(); if (store.voice) say('Voice on'); };
 $('#togSound').onclick = () => { store.sound = !store.sound; persist(); buildMenu(); tone(660, 0.07); };
 $('#homeBtn').onclick = () => goMenu();
@@ -951,13 +1127,417 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) save(
 // Android back button: close popup → go to menu → exit app
 window.onAndroidBack = function () {
   if (overlayClose) { overlayClose(); return true; }
-  if (G) { goMenu(); return true; }
+  if (G || $('#learn').classList.contains('active')) { goMenu(); return true; }
   return false;
 };
 
+/* ================= LEARN THE SHAPE: See it / Link it / Name it (squares & cubes) ================= */
+const LEARN = {
+  see:  { title: 'See it',  desc: 'Picture → number' },
+  link: { title: 'Link it', desc: 'Number → picture → name' },
+  name: { title: 'Name it', desc: 'Which power is it?' }
+};
+const isLearn = op => !!LEARN[op];
+const STAGES = {
+  squares: [{ label: '1²–10²', lo: 2, hi: 10 }, { label: '11²–20²', lo: 11, hi: 20 }, { label: '21²–30²', lo: 21, hi: 30 },
+            { label: '31²–50²', lo: 31, hi: 50 }, { label: '30², 300²…', tens: true, kMax: 6 }],
+  cubes:   [{ label: '1³–10³', lo: 2, hi: 10 }, { label: '11³–20³', lo: 11, hi: 20 }, { label: '21³–30³', lo: 21, hi: 30 },
+            { label: '30³, 300³…', tens: true, kMax: 5 }]
+};
+const STAGE_GOAL = 10;          // first-try answers to tick a stage ✓
+let LQ = null;                   // the current question
+const PW = () => store.ladder === 'cubes' ? 3 : 2;
+const PS = p => p === 3 ? '³' : p === 2 ? '²' : sup(p);
+const shuf = a => { a = a.slice(); shuffleArr(a); return a; };
+function lstate() {
+  store.learn2 = store.learn2 || {};
+  const k = modeKey();
+  // start just past what he already knows: squares 21–30, cubes 11–20 (any range can be picked)
+  if (!store.learn2[k]) store.learn2[k] = { stage: store.ladder === 'cubes' ? 1 : 2, stars: 0, done: {}, facts: {} };
+  const ls = store.learn2[k];
+  if (!STAGES[store.ladder][ls.stage]) ls.stage = 0;
+  return ls;
+}
+const factKey = f => f.a + 'e' + f.k;
+const sciAll = v => { if (v < 10n) return v.toString(); const [m, e] = sci(v); return `${m}×10${sup(e)}`; };
+const baseLbl = (a, k) => k ? (a === 1 ? '10' + sup(k) : `${a}×10${sup(k)}`) : String(a);
+const wrapB = s => (s.includes('×') || /[⁰¹²³⁴⁵⁶⁷⁸⁹]/.test(s)) ? `(${s})` : s;   // (10¹)³, not 10¹³
+const powLbl = (a, k, p) => wrapB(baseLbl(a, k)) + PS(p);
+const coefLbl = (coef, e) => `${coef}×10${sup(e)}`;
+const valLbl = (f, v) => f.k ? coefLbl(B(f.a) ** B(f.p), f.p * f.k) : fmt(v);
+const sayBase = f => f.k ? `${f.a} times ten to the ${f.k}` : String(f.a);
+const timesWord = p => p === 2 ? 'double' : 'triple';
+
+function makeFact(si) {
+  const st = STAGES[store.ladder][si], p = PW(), pool = [];
+  if (st.tens) { for (let a = 1; a <= 9; a++) for (let k = 1; k <= st.kMax; k++) pool.push({ a, k }); }
+  else for (let a = st.lo; a <= st.hi; a++) pool.push({ a, k: 0 });
+  const facts = lstate().facts;
+  // missed facts come back more, mastered ones fade out
+  const w = pool.map(f => { const s = facts[factKey(f)] || { g: 0, m: 0 }; return Math.max(0.25, 2 + 3 * s.m - 1.2 * s.g); });
+  let f;
+  for (let t = 0; t < 6; t++) { f = pickW(pool, w); if (!LQ || factKey(f) !== factKey(LQ.f)) break; }
+  const b = B(f.a) * 10n ** B(f.k);
+  return { a: f.a, k: f.k, p, b, v: b ** B(p), si };
+}
+
+/* ---------- pictures ---------- */
+// Wrap a flat picture with its side lengths: "16" across the top and down the left.
+function ruled(inner, top, left) {
+  return `<div class="ruled"><div></div><div class="rtop"><span>${top}</span></div><div class="rleft"><span>${left}</span></div>${inner}</div>`;
+}
+function picSquare(n, m, maxW, maxH, split) {
+  const pitch = Math.min(maxW / n, maxH / m), cell = pitch * 0.8, g = pitch - cell;
+  let h = `<div class="dots" role="img" aria-label="${m} by ${n} dots" style="grid-template-columns:repeat(${n},${cell.toFixed(2)}px);gap:${g.toFixed(2)}px">`;
+  for (let r = 0; r < m; r++) for (let c = 0; c < n; c++) {
+    const col = split && r >= split ? (r % 2 ? '#8be8c4' : '#06b67f') : (r % 2 ? '#a9cbff' : '#3a86ff');   // each row = one "lot"
+    h += `<i style="width:${cell.toFixed(2)}px;height:${cell.toFixed(2)}px;background:${col}"></i>`;
+  }
+  return h + '</div>';
+}
+// Isometric block cube. edges = [x, y, z] labels for the three visible edges (or null).
+function picCube(nx, ny, nz, maxW, maxH, label, edges, split) {
+  const c = Math.cos(Math.PI / 6);
+  const lp = edges ? Math.max(30, Math.max(...edges.map(e => String(e).length)) * 11 + 12) : 2;  // room for edge labels
+  const tp = edges ? 30 : 2;
+  const u = Math.min((maxW - 2 * lp) / ((nx + ny) * c), (maxH - 2 * tp) / ((nx + ny) / 2 + nz));
+  const W = (nx + ny) * u * c + 2 * lp, H = (nx + ny) * u / 2 + nz * u + 2 * tp;
+  const V = [ny * u * c + lp, (nx + ny) * u / 2 + tp];
+  const a = [u * c, -u / 2], b = [-u * c, -u / 2], d = [0, u];
+  const faces = [[nx, ny, a, b, '#ffc94d', '#ffc94d'], [ny, nz, b, d, '#e08a00', '#f7c56a'], [nx, nz, a, d, '#a85f00', '#d9963a']];   // sides striped by layer
+  const sw = Math.min(0.6, u * 0.06).toFixed(2);
+  let polys = '';
+  for (const [n1, n2, v1, v2, A, Bc] of faces) for (let i = 0; i < n1; i++) for (let j = 0; j < n2; j++) {
+    const x = V[0] + i * v1[0] + j * v2[0], y = V[1] + i * v1[1] + j * v2[1];
+    const pts = [[x, y], [x + v1[0], y + v1[1]], [x + v1[0] + v2[0], y + v1[1] + v2[1]], [x + v2[0], y + v2[1]]];
+    polys += `<polygon points="${pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ')}" fill="${v2 === d && split && j >= split ? (v1 === b ? (j % 2 ? '#6fdcae' : '#0e9f6e') : (j % 2 ? '#3fbf8a' : '#08734f')) : v2 === d && j % 2 ? Bc : A}" stroke="#4a2a00" stroke-width="${sw}"/>`;
+  }
+  let txt = '';
+  if (label && u >= 22) {
+    for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) {
+      const x = V[0] + (i + 0.5) * a[0] + (j + 0.5) * b[0], y = V[1] + (i + 0.5) * a[1] + (j + 0.5) * b[1];
+      txt += `<text x="${x.toFixed(1)}" y="${(y + u * 0.12).toFixed(1)}" font-size="${(u * 0.32).toFixed(1)}" font-weight="900" text-anchor="middle" fill="#4a2a00">${label}</text>`;
+    }
+  }
+  if (edges) {
+    const F = [V[0], V[1] + nz * u];                                  // front-bottom corner
+    const t = (x, y, s, anchor) => `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="19" font-weight="900" text-anchor="${anchor}" dominant-baseline="middle" fill="#ffffff">${s}</text>`;
+    const mx = [F[0] + nx / 2 * a[0], F[1] + nx / 2 * a[1]], my = [F[0] + ny / 2 * b[0], F[1] + ny / 2 * b[1]];
+    const L0 = [V[0] + ny * b[0], V[1] + ny * b[1]];                   // left vertical edge, top
+    txt += t(mx[0] + 9, mx[1] + 15, edges[0], 'start') + t(my[0] - 9, my[1] + 15, edges[1], 'end') + t(L0[0] - 8, L0[1] + nz * u / 2, edges[2], 'end');
+  }
+  return `<svg role="img" aria-label="${nx} by ${ny} by ${nz} blocks" width="${W.toFixed(0)}" height="${H.toFixed(0)}" viewBox="0 0 ${W.toFixed(1)} ${H.toFixed(1)}">${polys}${txt}</svg>`;
+}
+function picBlocks(n, m, label, maxW, maxH) { // big blocks, each holding 10ⁿ little ones
+  const pitch = Math.min(maxW / n, maxH / m), cell = pitch * 0.9, g = pitch - cell;
+  const fs = cell * 0.3, show = cell >= 30;
+  let h = `<div class="blocks" role="img" aria-label="${m} by ${n} big blocks" style="grid-template-columns:repeat(${n},${cell.toFixed(1)}px);gap:${g.toFixed(1)}px">`;
+  for (let r = 0; r < m; r++) for (let c = 0; c < n; c++)
+    h += `<div style="width:${cell.toFixed(1)}px;height:${cell.toFixed(1)}px;font-size:${fs.toFixed(1)}px${r % 2 ? ';background:#a9cbff' : ''}">${show ? label : ''}</div>`;
+  return h + '</div>';
+}
+// The picture for a shape; for the tens stage each unit is a big block of 10^(p·k).
+// sides = text for each side length (See it shows them; Link it doesn't, that's the puzzle).
+function shapePic(f, dims, maxW, maxH, blockExp, sides, split) {
+  const [x, y, z] = dims;
+  if (f.p === 2) {
+    const lw = sides ? Math.max(34, String(sides).length * 10 + 8) : 0, lh = sides ? 30 : 0;
+    const pic = f.k ? picBlocks(x, y, '10' + sup(blockExp), maxW - lw, maxH - lh) : picSquare(x, y, maxW - lw, maxH - lh, split);
+    return sides ? ruled(pic, sides, sides) : pic;
+  }
+  return picCube(x, y, z, maxW, maxH, f.k ? '10' + sup(blockExp) : '', sides ? [sides, sides, sides] : null, split);
+}
+function picCaption(f, blockExp) {
+  const a = f.a;
+  if (f.k) return f.p === 2 ? `${a} lots of ${a} big blocks · each is 10${sup(blockExp)}` : `${a} layers of ${a} × ${a} big blocks · each is 10${sup(blockExp)}`;
+  return f.p === 2 ? `${a} lots of ${a}` : `${a} layers, each ${a} lots of ${a}`;
+}
+
+/* ---------- building questions ---------- */
+function pickWrong(cands, rightKey, n) {
+  const seen = new Set([rightKey]), out = [];
+  for (const c of shuf(cands)) { if (!c || seen.has(c.key)) continue; seen.add(c.key); out.push(c); if (out.length === n) break; }
+  return out;
+}
+function seeChoices(f) {
+  const { a, k, p, v } = f, P = B(p);
+  if (k) {  // labels like 81×10²: front number, then the zeros
+    const ap = B(a) ** P, rl = coefLbl(ap, p * k);
+    const cands = [
+      [ap, k],                 // forgot to multiply the zeros
+      [B(a * p), p * k],       // doubled/tripled instead of squared/cubed
+      [ap, p * k + 1],         // one zero too many
+      p * k > 1 ? [ap, p * k - 1] : null,
+      [B(a + 1) ** P, p * k]
+    ].filter(Boolean).map(([c, e]) => ({ key: coefLbl(c, e), label: coefLbl(c, e) }));
+    return shuf([{ label: rl, right: true }, ...pickWrong(cands, rl, 3).map(w => ({ label: w.label }))]);
+  }
+  const cands = [B(a - 1) ** P, B(a + 1) ** P, B(a) ** (P - 1n) * B(a - 1), B(a) ** (P - 1n) * B(a + 1)];
+  const wrong = pickWrong(cands.filter(x => x > 0n).map(x => ({ key: x.toString(), label: fmt(x) })), v.toString(), 3);
+  return shuf([{ label: fmt(v), right: true }, ...wrong.map(w => ({ label: w.label }))]);
+}
+function picChoices(f) {
+  const { a, k, p } = f, e = p * k, W = 140, H = 118;
+  const mk = (dims, exp, key) => ({ key, dims, exp });
+  let cands;
+  if (!k) {
+    cands = p === 2
+      ? [mk([a - 1, a - 1], 0, 's' + (a - 1)), mk([a + 1, a + 1], 0, 's' + (a + 1)), mk([a, a > 2 ? a - 2 : a + 1], 0, 'r' + a)]
+      : [mk([a - 1, a - 1, a - 1], 0, 'c' + (a - 1)), mk([a + 1, a + 1, a + 1], 0, 'c' + (a + 1)), mk([a, a, a > 2 ? a - 1 : a + 1], 0, 'b' + a)];
+  } else {
+    const d = a > 1 ? a - 1 : a + 2;
+    cands = p === 2
+      ? [mk([a, a], k, 'z' + a), mk([d, d], e, 's' + d), mk([a + 1, a + 1], e, 's' + (a + 1)), mk([a, a + 1], e, 'r' + a)]
+      : [mk([a, a, a], k, 'z' + a), mk([d, d, d], e, 'c' + d), mk([a + 1, a + 1, a + 1], e, 'c' + (a + 1))];
+  }
+  cands = cands.filter(c => c.dims.every(x => x >= 1));
+  const right = mk(p === 2 ? [a, a] : [a, a, a], e, 'right');
+  const wrong = pickWrong(cands, 'right', 3);
+  return shuf([right, ...wrong]).map(c => ({
+    right: c.key === 'right', pic: true,
+    label: shapePic(f, c.dims, W, H, c.exp) + (k ? `<span class="pcap">each 10${sup(c.exp)}</span>` : '')
+  }));
+}
+// Name it: every choice is "power over what it means" (12³ / 12 × 12 × 12). One is right;
+// the others are neighbours and the other power, so a miss teaches what the little number means.
+function powerChoice(a, k, p) {
+  const bl = baseLbl(a, k), val = (B(a) * 10n ** B(k)) ** B(p);
+  const exp = Array(p).fill(k ? wrapB(bl) : bl).join(' × ');
+  const v = k ? coefLbl(B(a) ** B(p), p * k) : fmt(val);
+  return { key: `${a}e${k}p${p}`, two: true, pow: powLbl(a, k, p), exp,
+    label: `<span class="nmain">${powLbl(a, k, p)}</span><span class="nsub">${exp}</span>`,
+    why: `${powLbl(a, k, p)} = ${exp} = ${v}`,
+    whySay: `That's ${Array(p).fill(k ? sayBase({ a, k }) : a).join(' times ')}, which is ${k ? sayNum(val) : val}.` };
+}
+function nameItChoices(f) {
+  const { a, k, p } = f, q = p === 2 ? 3 : 2;
+  const right = { ...powerChoice(a, k, p), right: true };
+  const cands = [powerChoice(a + 1, k, p), a > 1 ? powerChoice(a - 1, k, p) : powerChoice(a + 2, k, p),
+    powerChoice(a, k, q), a > 1 ? powerChoice(a - 1, k, q) : powerChoice(a + 1, k, q)];
+  return shuf([right, ...pickWrong(cands, right.key, 4)]);
+}
+function nameChoices(f, count) {
+  const { a, k, p } = f, q = p === 2 ? 3 : 2, bl = baseLbl(a, k);
+  const right = [{ key: 'pow', label: powLbl(a, k, p), right: true }];
+  if (count === 5) right.push({ key: 'exp', label: Array(p).fill(k ? wrapB(bl) : bl).join(' × '), right: true });
+  const cands = [
+    { key: 'other', label: powLbl(a, k, q) },
+    a * p !== a ** p ? { key: 'times', label: `${k ? wrapB(bl) : bl} × ${p}` } : null,   // 2 × 2 is 2², so not a trap
+    { key: 'next', label: powLbl(a + 1, k, p) },
+    a > 2 ? { key: 'prev', label: powLbl(a - 1, k, p) } : null,
+    k ? { key: 'zeros', label: powLbl(a, p * k, p) } : null
+  ].filter(Boolean);
+  return shuf([...right, ...pickWrong(cands, 'pow', count - right.length)]);
+}
+function buildQ() {
+  const ls = lstate(), f = makeFact(ls.stage), mode = store.op;
+  const q = { f, mode, step: 0, found: 0, misses: 0, first: true, busy: false, feedback: '' };
+  if (mode === 'see') { q.choices = seeChoices(f); q.need = 1; }
+  if (mode === 'link') { q.choices = picChoices(f); q.need = 1; }
+  if (mode === 'name') { q.choices = nameItChoices(f); q.need = 1; }
+  return q;
+}
+// "17 lots of 17 = 10 lots (170) + 7 lots (119) = 289": split by tens, the way he thinks about it
+function lotsSplit(a, each, word) {
+  const t = Math.floor(a / 10) * 10, r = a - t;
+  if (a <= 10 || r === 0) return `${a} ${word} of ${each} = ${a * each}`;
+  return `${a} ${word} of ${each} = ${t} ${word} (${t * each}) + ${r} ${word} (${r * each}) = ${a * each}`;
+}
+function explain(f) {
+  const { a, k, p, v } = f;
+  if (!k) return p === 2 ? lotsSplit(a, a, 'lots') : `${a} lots of ${a} = ${a * a} in each layer. ${lotsSplit(a, a * a, 'layers')}`;
+  const ap = B(a) ** B(p);
+  return `${Array(p).fill(a).join(' × ')} = ${ap}, and the zeros ${timesWord(p)}: ${Array(p).fill(k).join(' + ')} = ${p * k}. So ${powLbl(a, k, p)} = ${coefLbl(ap, p * k)}.`;
+}
+function explainSpoken(f) {
+  const { a, k, p, v } = f;
+  if (!k) return p === 2 ? `Yes! ${a} lots of ${a} is ${sayNum(v)}!` : `Yes! ${a} layers of ${a * a} is ${sayNum(v)}!`;
+  return `Yes! ${Array(p).fill(a).join(' times ')} is ${B(a) ** B(p)}, and the zeros ${timesWord(p)}. That's ${sayNum(v)}!`;
+}
+function promptSpoken() {
+  if (!LQ) return '';
+  const f = LQ.f, sb = sayBase(f);
+  if (LQ.mode === 'see') return f.p === 2 ? 'How many dots?' : 'How many blocks?';
+  if (LQ.mode === 'link') return LQ.step === 0 ? `Which picture is ${Array(f.p).fill(sb).join(' times ')}?` : 'Now, what is its name?';
+  return `What is ${sayNum(f.v)}? Find two names.`;
+}
+
+/* ---------- screen ---------- */
+function renderLearn() {
+  const ls = lstate(), st = STAGES[store.ladder], f = LQ.f;
+  $('#lLabel').innerHTML = `${L().title}<small>${LEARN[store.op].title} · ${st[ls.stage].label}</small>`;
+  $('#lStars').textContent = `★ ${ls.stars}`;
+  $('#lStages').innerHTML = st.map((s, i) => {
+    const done = ((ls.done || {})[i] || 0) >= STAGE_GOAL;
+    return `<button class="stg${i === ls.stage ? ' now' : ''}${done ? ' done' : ''}" data-stage="${i}">${done ? '✓ ' : ''}${s.label}</button>`;
+  }).join('');
+  const blockExp = f.p * f.k, chs = LQ.choices.map((c, i) =>
+    `<button class="ch${c.pic ? ' pic' : ''}${c.state ? ' ' + c.state : ''}${c.hl && !c.state ? ' hl' : ''}" data-i="${i}" style="${!c.pic && !c.two ? `font-size:${Math.max(17, Math.min(30, 300 / Math.max(6, c.label.length)))}px` : ''}">${c.state === 'right' ? '✓ ' : ''}${c.label}</button>`).join('');
+  let h = '';
+  if (LQ.why) {
+    const w = LQ.why, t = Math.floor(f.a / 10) * 10, split = !f.k && f.a > 10 && f.a % 10 ? t : 0;
+    const dims = f.p === 2 ? [f.a, f.a] : [f.a, f.a, f.a];
+    const pic = shapePic(f, dims, 300, f.p === 2 ? 230 : 220, blockExp, baseLbl(f.a, f.k), split);
+    const D = 0.6, gapS = 1.0;
+    h = `<div class="celebrate"><span class="praise">${w.praise}</span>${w.star ? '<span class="plus">+1 ★</span>' : ''}</div>
+      <div class="lcard xcard">
+        <div class="xtitle">${powLbl(f.a, f.k, f.p)} = ${valLbl(f, f.v)}</div>
+        ${pic}
+        <div class="xsteps">${w.steps.map((x, i) => `<div class="xstep${x.big ? ' big' : ''}" style="animation-delay:${(D + i * gapS).toFixed(1)}s${x.color ? ';color:' + x.color : ''}">${x.text}</div>`).join('')}</div>
+      </div>
+      <button class="nextbtn" id="lNext" style="animation-delay:${(D + w.steps.length * gapS).toFixed(1)}s">Next ▶</button>`;
+  } else if (LQ.mode === 'see') {
+    const pic = shapePic(f, f.p === 2 ? [f.a, f.a] : [f.a, f.a, f.a], 310, f.p === 2 ? 290 : 280, blockExp, baseLbl(f.a, f.k));
+    h = `<div class="lcard"><div class="lq">${f.p === 2 ? (f.k ? 'How many little dots?' : 'How many dots?') : (f.k ? 'How many little blocks?' : 'How many blocks?')}</div>${pic}<div class="lcap">${picCaption(f, blockExp)}</div></div>
+      <div class="chs two">${chs}</div>`;
+  } else if (LQ.mode === 'link') {
+    const bl = baseLbl(f.a, f.k);
+    const s1 = LQ.step === 0 ? 'now' : 'done';
+    h = `<div class="lsteps"><div class="lstep done">${bl}</div><span class="larr">›</span><div class="lstep ${s1}">${LQ.step === 0 ? 'picture?' : '✓'}</div><span class="larr">›</span><div class="lstep ${LQ.step === 1 ? 'now' : ''}">${LQ.step === 1 ? 'name?' : 'name'}</div></div>
+      <div class="lq">${LQ.step === 0 ? 'Which picture is' : `What's the name of`} ${Array(f.p).fill(f.k ? wrapB(bl) : bl).join(' × ')}?</div>
+      <div class="chs two">${chs}</div>`;
+  } else {
+    h = `<div class="lcard"><div class="lsub">What is this number?</div><div class="lbig" style="font-size:${Math.max(34, Math.min(64, 400 / Math.max(4, valLbl(f, f.v).length)))}px">${valLbl(f, f.v)}</div>
+      <div class="lfound">${LQ.found ? 'Got it!' : 'Which power makes this number?'}</div></div>
+      <div class="chs">${chs}</div>`;
+  }
+  if (LQ.note && !LQ.why) h += `<div class="lfb bad">${LQ.note}</div>`;
+  $('#lBody').innerHTML = h;
+  document.querySelectorAll('#lBody .ch').forEach(b => b.onclick = () => answer(+b.dataset.i, b));
+  if ($('#lNext')) $('#lNext').onclick = () => { audio(); nextQ(); };
+  document.querySelectorAll('#lStages .stg').forEach(b => b.onclick = () => { if (LQ.busy && !LQ.why) return; ls.stage = +b.dataset.stage; persist(); nextQ(); });
+}
+function nextQ() { LQ = buildQ(); renderLearn(); }
+function answer(i, btn) {
+  if (!LQ || LQ.busy) return;
+  const c = LQ.choices[i];
+  if (c.state) return;
+  audio();
+  if (!c.right) {
+    c.state = 'wrong'; LQ.first = false; LQ.misses++;
+    if (c.why) { LQ.note = `Not this one: ${c.why}`; sfxBad(); say(`Not that one. ${c.whySay} Try again.`);
+      if (LQ.misses >= 2) LQ.choices.forEach(x => { if (x.right && !x.state) x.hl = true; });
+      renderLearn(); return; }
+    if (LQ.misses >= 2) LQ.choices.forEach(x => { if (x.right && !x.state) x.hl = true; });
+    sfxBad(); say('Not that one. Try again.');
+    renderLearn();
+    return;
+  }
+  c.state = 'right'; LQ.found++;
+  tone(660, 0.1, 'triangle', 0.12); tone(990, 0.12, 'triangle', 0.1, 0.07);
+  if (LQ.found < LQ.need) { say('Yes! Find one more.'); renderLearn(); return; }
+  if (LQ.mode === 'link' && LQ.step === 0) {
+    LQ.step = 1; LQ.found = 0; LQ.misses = 0; LQ.choices = nameChoices(LQ.f, 4);
+    say('Yes! Now, what is its name?'); renderLearn(); return;
+  }
+  finishQ();
+}
+const PRAISE = ['Yes!', 'You got it!', 'Brilliant!', 'Awesome!', 'Nailed it!', 'Super!', 'Great thinking!'];
+let learnStreak = 0;
+const BLUE = '#8fbaff', GREEN = '#4fe0a8', ORANGE = '#ffc06a';
+// Each step: text on screen, words for the voice, colour (matches the picture's two parts)
+const lotW = n => n === 1 ? 'lot' : 'lots', layW = n => n === 1 ? 'layer' : 'layers', blkW = n => n === 1n || n === 1 ? 'big block' : 'big blocks';
+const bigOrPlain = v => v < 10n ** 9n ? v.toLocaleString('en-US') : nameOf(v);
+const endStop = x => /[.!?]$/.test(x.trim()) ? x : x + '.';
+function whySteps(f) {
+  const { a, k, p } = f, st = [], add = (text, sayIt, color, big) => st.push({ text, sayIt: sayIt || text, color, big });
+  const t = Math.floor(a / 10) * 10, r = a - t, splitOK = !k && a > 10 && r > 0;
+  if (k) {
+    const n = B(a) ** B(p), e = p * k;
+    add(p === 2 ? `${a} ${lotW(a)} of ${a} = ${n} ${blkW(n)}` : `${a} × ${a} × ${a} = ${n} ${blkW(n)}`, null, BLUE);
+    add(`Each block: 10${sup(k)} ${p === 2 ? '× 10' + sup(k) : '× 10' + sup(k) + ' × 10' + sup(k)} = 10${sup(e)}`,
+        `Each block is ten to the ${e}. The zeros ${timesWord(p)}: ${Array(p).fill(k).join(' plus ')} is ${e}.`, ORANGE);
+    add(`${Array(p).fill(k).join(' + ')} = ${e} zeros`, ' ', ORANGE);
+    add(`${n} × 10${sup(e)} = ${bigOrPlain(f.v)}`, `So it's ${sayNum(f.v)}!`, null, true);
+    return st;
+  }
+  if (p === 2) {
+    add(`${a} lots of ${a}`);
+    if (splitOK) {
+      add(`${t} lots of ${a} = ${t * a}`, null, BLUE);
+      add(`${r} ${lotW(r)} of ${a} = ${r * a}`, null, GREEN);
+      add(`${t * a} + ${r * a} = ${a * a}`, `${t * a} plus ${r * a} is ${a * a}!`, null, true);
+    } else if (a <= 10) {
+      const counts = Array.from({ length: a }, (_, i) => (i + 1) * a);
+      add(`Count by ${a}s: ${counts.join(', ')}`, `Count by ${a}s: ${counts.join(', ')}.`, BLUE);
+      add(`${a} × ${a} = ${a * a}`, `${a} lots of ${a} is ${a * a}!`, null, true);
+    } else {
+      add(`${t / 10} × ${t / 10} = ${(t / 10) ** 2}, add two zeros`, null, BLUE);
+      add(`${a} × ${a} = ${a * a}`, `${a} lots of ${a} is ${a * a}!`, null, true);
+    }
+    return st;
+  }
+  const L2 = a * a;
+  add(`Each layer: ${a} lots of ${a} = ${L2}`, `Each layer is ${a} lots of ${a}. That's ${L2}.`, ORANGE);
+  add(`${a} layers of ${L2}`);
+  if (splitOK) {
+    add(`${t} layers = ${t * L2}`, `${t} layers is ${t * L2}.`, ORANGE);
+    add(`${r} ${layW(r)} = ${r * L2}`, `${r} ${layW(r)} is ${r * L2}.`, GREEN);
+    add(`${t * L2} + ${r * L2} = ${a ** 3}`, `${t * L2} plus ${r * L2} is ${a ** 3}!`, null, true);
+  } else if (a <= 5) {
+    const counts = Array.from({ length: a }, (_, i) => (i + 1) * L2);
+    add(`Count by ${L2}s: ${counts.join(', ')}`, null, ORANGE);
+    add(`${a} × ${a} × ${a} = ${a ** 3}`, `${a} cubed is ${a ** 3}!`, null, true);
+  } else {
+    add(`${a} × ${L2} = ${a ** 3}`, `${a} layers of ${L2} is ${a ** 3}!`, null, true);
+  }
+  return st;
+}
+function finishQ() {
+  const ls = lstate(), f = LQ.f, key = factKey(f), s = ls.facts[key] || { g: 0, m: 0 };
+  if (LQ.first) { s.g++; ls.stars++; ls.done[ls.stage] = (ls.done[ls.stage] || 0) + 1; } else s.m++;
+  ls.facts[key] = s; persist();
+  learnStreak = LQ.first ? learnStreak + 1 : 0;
+  const praise = learnStreak >= 3 && learnStreak % 3 === 0 ? `${learnStreak} in a row!` : LQ.first ? PRAISE[Math.floor(Math.random() * PRAISE.length)] : 'You got it!';
+  const steps = whySteps(f);
+  LQ.busy = true; LQ.why = { praise, star: LQ.first, steps };
+  sfxMerge(); buzz(25);
+  if (LQ.first) { setTimeout(sfxStar, 250); confetti(learnStreak >= 3 ? 70 : 34); }
+  say(`${praise} ` + steps.map(x => x.sayIt).filter(x => x.trim()).map(endStop).join(' '));
+  renderLearn();
+  if (LQ.first && ls.done[ls.stage] === STAGE_GOAL) setTimeout(() => { confetti(90); sfxStar(); toast('Level done! ✓', STAGES[store.ladder][ls.stage].label, 2200); }, 1500);
+}
+function learnHint() {
+  if (!LQ || LQ.busy) return;
+  const wrong = LQ.choices.filter(c => !c.right && !c.state);
+  if (wrong.length > 1) { wrong[Math.floor(Math.random() * wrong.length)].state = 'dim'; LQ.first = false; renderLearn(); }
+  const f = LQ.f;
+  const a = f.a;
+  say(f.k ? `Multiply the front numbers, then ${timesWord(f.p)} the zeros.`
+    : f.p === 2 ? `Think ${a} lots of ${a}.` + (a > 10 ? ` Ten lots of ${a} is ${10 * a}.` : '')
+    : `Each layer is ${a} lots of ${a}, that's ${a * a}. Now ${a} layers.`);
+}
+function startLearn() {
+  G = null; clearBoardEls();
+  showScreen('learn'); LQ = null; nextQ();
+}
+$('#lHome').onclick = () => goMenu();
+$('#lHint').onclick = () => learnHint();
+$('#lSay').onclick = () => { audio(); say(LQ && LQ.why ? LQ.why.steps.map(x => x.sayIt).filter(x => x.trim()).map(endStop).join(' ') : promptSpoken()); };
+
 buildMenu();
+
+// Android app only: show the build number and offer newer builds from GitHub Releases.
+(function updates() {
+  const A = window.Android;
+  if (!A || !A.buildNumber) return;
+  let mine = 0;
+  try { mine = A.buildNumber(); } catch (e) { return; }
+  $('#buildNo').textContent = `Build ${mine}`;
+  window.onUpdateInfo = info => {
+    if (!info || !info.build || info.build <= mine || !info.url) return;
+    const b = $('#updateBtn');
+    b.textContent = `⬆️ New version! Tap to update (build ${info.build})`;
+    b.style.display = '';
+    b.onclick = () => {
+      A.openUrl(info.url);
+      b.textContent = '⬇️ Downloading… tap the file when done, then Update';
+    };
+  };
+  try { A.checkUpdate(); } catch (e) {}
+})();
 // debug hooks for automated tests
-window.__mm = { stats, staleBelow, get G() { return G; }, findMove, valid, O, L, store, startGame, fmt, nameOf, iroot, celebration, updateHUD, render,
+window.__mm = { canExtend, goalValue, get LQ() { return LQ; }, answer, learnHint, startLearn, nextQ, lstate, STAGES, stats, staleBelow, get G() { return G; }, findMove, valid, O, L, store, startGame, fmt, nameOf, iroot, celebration, updateHUD, render,
   get busy() { return busy; }, get cell() { return cell; } };
 </script>
 </body>

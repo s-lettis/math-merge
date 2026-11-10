@@ -15,6 +15,12 @@ android {
         targetSdk 35
         versionCode buildNumber
         versionName "1.0." + buildNumber
+        // Which GitHub repo to check for updates (filled in automatically by GitHub Actions)
+        buildConfigField "String", "REPO", "\"${System.getenv('GITHUB_REPOSITORY') ?: ''}\""
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 
     // A fixed signing key that lives in the repo, so every new APK installs
