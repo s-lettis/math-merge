@@ -1,0 +1,41 @@
+name: Publish web version
+
+# Puts the game on GitHub Pages for iPhones / any browser:
+#   https://<your-username>.github.io/<repo-name>/
+# One-time setup: repo Settings → Pages → Source: "GitHub Actions" (repo must be public).
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Set up Pages
+        uses: actions/configure-pages@v5
+
+      - name: Package the web game
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/src/main/assets
+
+      - name: Publish to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
