@@ -17,11 +17,12 @@ of 5). Pictures are shaded in blocks of 5. Each has 3 stages: warm-up
 (1²–20², 1³–11³), stretch (21²–30², 12³–20³) and tens (30², 300², (3×10⁵)² …
 where the zeros double or triple). Missed facts come back more often.
 
-**No skipping:** a merge can never jump past the next goal on the ladder
-("Too big a jump! Make 36 first"). Times modes follow the shape being taught:
-Squares = 2 of the same (6 × 6), Cubes = 3 of the same (3 × 3 × 3, and the
-finished square/cube is collected onto the ladder), Doubling/Tens = exactly
-2 tiles (16 × 2, 10⁵ × 10).
+**No skipping:** free-form chains can never jump past the next goal on the
+ladder ("Too big a jump! Make 36 first"). Times modes follow the shape being
+taught: Squares = 2 of the same (6 × 6), Cubes = 3 of the same (3 × 3 × 3),
+Doubling/Tens = exactly 2 tiles (16 × 2, 10⁵ × 10). Two (or three) of the
+SAME tile can always merge, even past the goal: 2×2 → 4, 4×4 → 16,
+16×16 → 256; 10³ × 10³ = 10⁶.
 
 **Doubling · Adding** uses the true doubling rule: two equal tiles, then each
 next tile must equal the total so far (8 + 8 + 16 + 32).

@@ -387,8 +387,12 @@ const textOn = col => lightColor(col) ? '#2b1d00' : '#fff';
 const minIdx = () => (store.ladder === 'squares' || store.ladder === 'cubes') ? 1 : 0;
 const minVal = () => L().val(minIdx());
 // No skipping: a merge can't jump past the next goal. (The true doubling chain is exempt: it is already step by step.)
-const tooFar = res => !strictDoubling() && !!G && res > goalValue();
-const valid = res => res >= minVal() && L().is(res) && !tooFar(res);
+// Exceptions, because they're real structure, not random tracing:
+//  - the true doubling chain (8 + 8 + 16 + 32)
+//  - Times with tiles that are all the same (2×2 → 4, 4×4 → 16, 10³ × 10³ = 10⁶): squaring/cubing may jump ahead.
+const sameTimes = vals => !!vals && store.op === 'mul' && vals.length >= 2 && vals.every(v => v === vals[0]);
+const tooFar = (res, vals) => !strictDoubling() && !sameTimes(vals) && !!G && res > goalValue();
+const valid = (res, vals) => res >= minVal() && L().is(res) && !tooFar(res, vals);
 function whyNot(res) {
   if (res < 1n) return 'Too much taken away';
   if (!L().is(res)) return `${fmt(res)} is not a ${L().kind}`;
@@ -513,7 +517,7 @@ function findMove(maxLen = 5) {
   const op = O().apply, order = [...Array(N).keys()].sort(() => Math.random() - 0.5);
   const path = [];
   function dfs(len) {
-    if (path.length === len) return valid(op(path.map(i => G.grid[i].v)));
+    if (path.length === len) { const vs = path.map(i => G.grid[i].v); return valid(op(vs), vs); }
     if (store.op === 'sub' && path.length >= 2 && op(path.map(i => G.grid[i].v)) < 1n) return false;
     const last = path[path.length - 1];
     for (const n of NB[last]) {
@@ -651,7 +655,7 @@ function drawChain() {
   if (chain.length) {
     const pts = chain.map(center);
     let col = 'rgba(255,255,255,.55)';
-    if (chain.length >= 2) { const res = chainResult(); if (valid(res)) col = colorFor(res); }
+    if (chain.length >= 2) { const res = chainResult(); if (valid(res, chainVals())) col = colorFor(res); }
     html += `<polyline points="${pts.map(p => p.join(',')).join(' ')}" fill="none" stroke="${col}" stroke-width="${cell * 0.12}" stroke-linecap="round" stroke-linejoin="round" opacity=".75"/>`;
     html += pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="${cell * 0.075}" fill="${col}" opacity=".95"/>`).join('');
   } else if (hintPath) {
@@ -697,7 +701,7 @@ function showEq() {
     return;
   }
   if (sameN() === 3 && vals.length === 2) { setEq(eqString(vals, O().apply(vals)), '', `One more ${fmt(vals[0])} makes a cube!`); return; }
-  const res = O().apply(vals), ok = valid(res);
+  const res = O().apply(vals), ok = valid(res, vals);
   const note = ok ? (strictDoubling() ? `Let go — or double again with a ${fmt(res)}` : `${fmt(res)} is a ${L().kind}! Let go!`) : whyNot(res);
   setEq(eqString(vals, res), ok ? 'good' : 'bad', note);
 }
@@ -854,7 +858,7 @@ function finishChain() {
   chain = [];
   if (path.length < 2) { chainChanged(); return; }
   const vals = path.map(i => G.grid[i].v), res = O().apply(vals);
-  if (valid(res)) { merge(path, vals, res); return; }
+  if (valid(res, vals)) { merge(path, vals, res); return; }
   chainChanged();
   setEq(eqString(vals, res), 'bad', whyNot(res) + '. Try again!');
   eqHoldUntil = Date.now() + 1800;
@@ -933,15 +937,6 @@ async function merge(path, vals, res) {
   render();
   retrigger(tiles.get(G.grid[last].id).firstChild, 'pop');
   await sleep(150);
-  if (sameN() && !(party && party.kind === 'googol')) {
-    await sleep(380);
-    const el = tiles.get(G.grid[last].id);
-    el.style.transition = 'transform .45s ease-in, opacity .45s';
-    posEl(el, -2, lc, 0.5); el.style.opacity = '0';
-    tone(1046, 0.1, 'sine', 0.08);
-    await sleep(380);
-    G.grid[last] = null;
-  }
   if (party && party.kind === 'googol') {
     store.trophies[modeKey()] = (store.trophies[modeKey()] || 0) + 1;
     confetti(120); sfxStar();
