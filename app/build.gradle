@@ -1,0 +1,51 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Each GitHub build gets a higher version number so it installs as an update.
+def buildNumber = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInteger()
+
+android {
+    namespace 'com.slettis.mathmerge'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.slettis.mathmerge'
+        minSdk 26
+        targetSdk 35
+        versionCode buildNumber
+        versionName "1.0." + buildNumber
+    }
+
+    // A fixed signing key that lives in the repo, so every new APK installs
+    // over the old one (and keeps your kid's saved games) instead of
+    // failing with "App not installed".
+    signingConfigs {
+        fixed {
+            storeFile file('mathmerge.keystore')
+            storePassword 'mathmerge'
+            keyAlias 'mathmerge'
+            keyPassword 'mathmerge'
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.fixed
+        }
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.fixed
+        }
+    }
+
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

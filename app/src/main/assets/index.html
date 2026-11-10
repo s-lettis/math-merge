@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Math Merge</title>
+<style>
+:root{--bg:#14141f;--panel:#232336;--panel2:#2d2d45;--text:#fff;--muted:#9aa0b8;--good:#2ee59d;--bad:#ff6b85;--gold:#ffc300}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;overscroll-behavior:none}
+button{font:inherit;color:inherit;cursor:pointer}
+.screen{position:absolute;inset:0;display:none;flex-direction:column}
+.screen.active{display:flex}
+
+/* ---------- menu ---------- */
+#menu{align-items:stretch;padding:18px 16px 24px;gap:10px;overflow-y:auto}
+h1{font-size:46px;font-weight:900;text-align:center;line-height:1.05;margin-top:4px;
+  background:linear-gradient(90deg,#ffc300,#ff4d6d 50%,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{text-align:center;color:var(--muted);font-weight:700;letter-spacing:2px;font-size:14px;margin-bottom:4px}
+.section-title{font-size:15px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:8px}
+.choices{display:grid;gap:10px}
+.ops{grid-template-columns:repeat(3,1fr)}
+.choice{background:var(--panel);border:3px solid transparent;border-radius:18px;padding:12px 14px;text-align:left;display:flex;align-items:center;gap:10px}
+.choice.sel{border-color:var(--gold);background:var(--panel2)}
+.choice .big{font-size:22px;font-weight:900;line-height:1.1}
+.choice .small{font-size:13px;color:var(--muted);font-weight:600}
+.chips{display:flex;gap:4px;margin-left:auto}
+.chip{min-width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;padding:0 4px}
+.op{flex-direction:column;align-items:center;text-align:center;padding:10px 4px;gap:2px}
+.op .sym{font-size:40px;font-weight:900;line-height:1}
+.op .name{font-size:15px;font-weight:800}
+.op .lvl{font-size:12px;color:var(--muted);font-weight:700}
+.bestline{color:var(--muted);font-size:15px;text-align:center;min-height:20px;font-weight:700;margin-top:4px}
+#playBtn{font-size:30px;font-weight:900;color:#2b1d00;background:linear-gradient(180deg,#ffd84d,#ffaa00);border:none;border-radius:20px;padding:14px;box-shadow:0 6px 0 #b06e00}
+#playBtn:active{transform:translateY(4px);box-shadow:0 2px 0 #b06e00}
+.toggles{display:flex;gap:10px;margin-top:6px}
+.tog{flex:1;background:var(--panel);border:none;border-radius:14px;padding:12px 6px;font-size:14px;font-weight:800;color:var(--muted)}
+.tog.on{color:#fff;background:var(--panel2)}
+
+/* ---------- game ---------- */
+#game{padding:8px 8px 10px}
+.topbar{display:flex;align-items:center;gap:8px}
+.iconbtn{width:50px;height:50px;border-radius:14px;border:none;background:var(--panel);font-size:24px;display:flex;align-items:center;justify-content:center;flex:none}
+.iconbtn:active,.bigbtn:active{transform:scale(.94)}
+.modeLabel{flex:1;text-align:center;font-weight:900;font-size:19px;line-height:1.15}
+.modeLabel small{display:block;color:var(--muted);font-weight:700;font-size:13px}
+.ladder{display:flex;gap:4px;justify-content:center;align-items:center;margin:10px 0 2px;min-height:46px;overflow:hidden}
+.rung{min-width:46px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;padding:0 6px;background:#33334a;color:#8a8fa8;flex:none}
+.rung.goal{background:transparent;border:3px dashed var(--gold);color:var(--gold);animation:pulse 1.2s ease-in-out infinite}
+.arrow{color:#5d6280;font-weight:900;font-size:18px}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.equation{height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;flex:none}
+#eq{font-size:34px;font-weight:900;white-space:nowrap;line-height:1.1}
+#eq.good{color:var(--good)} #eq.bad{color:var(--bad)} #eq.idle{color:var(--gold)}
+#eqNote{font-size:15px;color:var(--muted);font-weight:700;min-height:19px;margin-top:2px}
+.boardWrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+#board{position:relative;touch-action:none;overflow:hidden;border-radius:14px}
+#line{position:absolute;left:0;top:0;pointer-events:none;z-index:5;overflow:visible}
+.tile{position:absolute;left:0;top:0;transition:transform .24s cubic-bezier(.34,1.35,.64,1),opacity .2s;z-index:1;will-change:transform}
+.face{width:100%;height:100%;border-radius:24%;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;
+  box-shadow:inset 0 -5px 0 rgba(0,0,0,.22);text-shadow:0 2px 0 rgba(0,0,0,.18)}
+.face b{line-height:1;font-weight:900}
+.face i{font-style:normal;font-weight:800;opacity:.8;line-height:1;margin-top:3px}
+.face.helper{box-shadow:inset 0 -5px 0 rgba(0,0,0,.25),inset 0 0 0 2px rgba(255,255,255,.12)}
+.face.sel{box-shadow:0 0 0 4px #fff,inset 0 -5px 0 rgba(0,0,0,.22)}
+.face.pop{animation:pop .36s ease}
+.face.wob{animation:wob .38s}
+.face.hint{animation:glow .6s ease-in-out 4}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.28)}100%{transform:scale(1)}}
+@keyframes wob{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+@keyframes glow{0%,100%{transform:scale(1)}50%{transform:scale(1.12);box-shadow:0 0 0 5px #fff,0 0 22px 8px #ffe066}}
+.bottombar{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;flex:none}
+.bigbtn{background:var(--panel);border:none;border-radius:16px;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:24px;line-height:1}
+.bigbtn span{font-size:12px;font-weight:800;color:var(--muted);margin-top:4px}
+#toast{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%) scale(.6);opacity:0;pointer-events:none;z-index:20;
+  background:rgba(20,20,31,.92);border:3px solid var(--gold);border-radius:22px;padding:14px 22px;text-align:center;transition:all .25s cubic-bezier(.34,1.4,.64,1);min-width:220px}
+#toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#toast .t1{font-size:30px;font-weight:900;color:var(--gold)}
+#toast .t2{font-size:17px;font-weight:800;color:#fff;margin-top:4px}
+
+/* ---------- overlay ---------- */
+.overlay{position:absolute;inset:0;background:rgba(8,8,14,.75);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+.overlay.show{display:flex}
+.card{background:var(--panel);border-radius:24px;padding:22px 20px;max-width:420px;width:100%;text-align:center}
+.card h2{font-size:28px;font-weight:900;margin-bottom:12px}
+.card p{font-size:18px;font-weight:700;line-height:1.35;margin:10px 0;text-align:left}
+.card .ex{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+.card .ex div{background:var(--bg);border-radius:12px;padding:8px;font-size:24px;font-weight:900;color:var(--good)}
+.card .row{display:flex;gap:10px;margin-top:14px}
+.card .row button{flex:1;border:none;border-radius:16px;padding:14px;font-size:22px;font-weight:900}
+.btn-yes{background:linear-gradient(180deg,#ffd84d,#ffaa00);color:#2b1d00}
+.btn-no{background:var(--panel2)}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:40;overflow:hidden}
+.conf{position:absolute;top:-20px;width:12px;height:16px;border-radius:3px;animation:fall 1.7s ease-in forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--rot));opacity:.9}}
+</style>
+</head>
+<body>
+
+<div id="menu" class="screen active">
+  <h1>Math Merge</h1>
+  <div class="tag">SLIDE · ADD · MERGE</div>
+  <div class="section-title">1. Pick a level</div>
+  <div class="choices" id="ladderChoices"></div>
+  <div class="section-title">2. Pick your math</div>
+  <div class="choices ops" id="opChoices"></div>
+  <div class="bestline" id="bestLine"></div>
+  <button id="playBtn">Play</button>
+  <div class="toggles">
+    <button class="tog" id="togVoice"></button>
+    <button class="tog" id="togSound"></button>
+  </div>
+</div>
+
+<div id="game" class="screen">
+  <div class="topbar">
+    <button class="iconbtn" id="homeBtn" aria-label="Home">🏠</button>
+    <div class="modeLabel" id="modeLabel"></div>
+    <button class="iconbtn" id="voiceBtn" aria-label="Voice">🔊</button>
+  </div>
+  <div class="ladder" id="ladder"></div>
+  <div class="equation"><div id="eq"></div><div id="eqNote"></div></div>
+  <div class="boardWrap" id="boardWrap"><div id="board"><svg id="line"></svg></div></div>
+  <div class="bottombar">
+    <button class="bigbtn" id="hintBtn">💡<span>Hint</span></button>
+    <button class="bigbtn" id="shuffleBtn">🔀<span>Shuffle</span></button>
+    <button class="bigbtn" id="helpBtn">❓<span>How to</span></button>
+    <button class="bigbtn" id="newBtn">🔄<span>New game</span></button>
+  </div>
+  <div id="toast"><div class="t1"></div><div class="t2"></div></div>
+</div>
+
+<div class="overlay" id="overlay"><div class="card" id="card"></div></div>
+<div id="fx"></div>
+
+<script>
+'use strict';
+/* ============================================================
+   Math Merge — chain-merge number game for little kids.
+   Level  = which "ladder" of numbers you build (doubling / squares / cubes / tens)
+   Math   = how a chain combines (add / take away / times)
+   A chain merges only if its answer is a number on the ladder.
+   All numbers are BigInt, so they stay exact all the way up to a googol (10^100).
+   ============================================================ */
+const COLS = 5, ROWS = 7, N = COLS * ROWS;
+const PALETTE = ['#ff4d6d','#3a86ff','#ffc300','#8b5cf6','#06b67f','#fb5607','#00a8cc','#d63ad1','#7cc242','#e5383b','#4361ee','#ff9f1c','#2ec4b6','#b5179e'];
+const HELPER = '#4a5372';
+const $ = s => document.querySelector(s);
+const B = BigInt;
+const GOOGOL = 10n ** 100n;
+const BIG = 100000n;      // from here on, numbers show as 10ⁿ
+const SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+const sup = n => String(n).split('').map(d => SUP[+d]).join('');
+const digits = v => v.toString().length;
+const bitlen = v => v.toString(2).length;
+const isPow10 = v => v >= 1n && /^10*$/.test(v.toString());
+
+// floor of the k-th root of a BigInt
+function iroot(n, k) {
+  if (n < 2n) return n;
+  const K = B(k);
+  let x;
+  if (n < 2n ** 100n) {
+    x = B(Math.floor(Math.pow(Number(n), 1 / k)));
+  } else {
+    x = 1n << B(Math.ceil(bitlen(n) / k));
+    for (;;) { const y = ((K - 1n) * x + n / (x ** (K - 1n))) / K; if (y >= x) break; x = y; }
+  }
+  while (x > 0n && x ** K > n) x--;
+  while ((x + 1n) ** K <= n) x++;
+  return x;
+}
+
+/* ---------- big number names ---------- */
+const ILLIONS = ['', 'thousand', 'million', 'billion', 'trillion', 'quadrillion', 'quintillion', 'sextillion', 'septillion',
+  'octillion', 'nonillion', 'decillion', 'undecillion', 'duodecillion', 'tredecillion', 'quattuordecillion', 'quindecillion',
+  'sexdecillion', 'septendecillion', 'octodecillion', 'novemdecillion', 'vigintillion'];
+function sci(v) { // 2 significant digits: [mantissa string, exponent]
+  const s = v.toString(), e = s.length - 1;
+  let m = Math.round(Number(s.slice(0, 3).padEnd(3, '0')) / 10), ee = e;
+  if (m >= 100) { m = 10; ee = e + 1; }
+  return [(m / 10).toFixed(1), ee];
+}
+function fmt(v) {
+  if (v < 0n) return '−' + fmt(-v);
+  const s = v.toString();
+  if (s.length <= 5) return s;
+  if (isPow10(v)) return '10' + sup(s.length - 1);
+  const [m, e] = sci(v);
+  return `${m}×10${sup(e)}`;
+}
+// Name a number in words: "one tredecillion", "about 1.4 tredecillion", "a googol"
+function nameOf(v, spoken) {
+  if (v < 0n) return 'minus ' + nameOf(-v, spoken);
+  if (v < 1000000n) return v.toString();
+  if (v === GOOGOL) return 'a googol';
+  const s = v.toString(), e = s.length - 1, g = Math.floor(e / 3);
+  if (g < ILLIONS.length) {
+    const leadLen = e - g * 3 + 1, lead = s.slice(0, leadLen), rest = s.slice(leadLen);
+    if (/^0*$/.test(rest)) return `${lead === '1' ? 'one' : lead} ${ILLIONS[g]}`;
+    let x = (Number(s.slice(0, leadLen + 2)) / 100).toFixed(1).replace(/\.0$/, '');
+    if (spoken) x = x.replace('.', ' point ');
+    return `about ${x} ${ILLIONS[g]}`;
+  }
+  if (isPow10(v)) return spoken ? `ten to the ${e}` : `10${sup(e)}`;
+  const [m, ee] = sci(v);
+  return spoken ? `about ${m} times ten to the ${ee}` : `about ${m}×10${sup(ee)}`;
+}
+const sayNum = v => nameOf(v, true);
+
+/* ---------- ladders ---------- */
+const LADDERS = {
+  doubling: {
+    title: 'Doubling', kind: 'doubling number', blurb: 'Each one is double the last',
+    val: i => 2n ** B(i + 1),
+    is: v => v >= 2n && (v & (v - 1n)) === 0n,
+    idx: v => v < 2n ? -1 : bitlen(v) - 2,
+    next: v => v < 2n ? 2n : 1n << B(bitlen(v)),
+    cap: v => v < 4n ? '' : v <= 512n ? `${v / 2n}+${v / 2n}` : '2' + sup(bitlen(v) - 1),
+    say: v => v >= 4n && v < 1000000n ? `That's ${v / 2n} plus ${v / 2n}.` : ''
+  },
+  squares: {
+    title: 'Squares', kind: 'square number', blurb: 'A number times itself',
+    val: i => B(i + 1) ** 2n,
+    is: v => { if (v < 1n) return false; const r = iroot(v, 2); return r * r === v; },
+    idx: v => v < 1n ? -1 : Number(iroot(v, 2)) - 1,
+    next: v => (iroot(v, 2) + 1n) ** 2n,
+    cap: v => { if (v < 4n) return ''; const r = iroot(v, 2); return v < 1000000n ? `${r}×${r}` : `(${fmt(r)})²`; },
+    say: v => { const r = iroot(v, 2); return v > 1n && v < 1000000n ? `That's ${r} times ${r}.` : ''; }
+  },
+  cubes: {
+    title: 'Cubes', kind: 'cube number', blurb: 'Times itself, 3 times',
+    val: i => B(i + 1) ** 3n,
+    is: v => { if (v < 1n) return false; const r = iroot(v, 3); return r * r * r === v; },
+    idx: v => v < 1n ? -1 : Number(iroot(v, 3)) - 1,
+    next: v => (iroot(v, 3) + 1n) ** 3n,
+    cap: v => { if (v < 8n) return ''; const r = iroot(v, 3); return v < 1000000n ? `${r}×${r}×${r}` : `(${fmt(r)})³`; },
+    say: v => { const r = iroot(v, 3); return v > 1n && v < 1000000n ? `That's ${r} times ${r} times ${r}.` : ''; }
+  },
+  tens: {
+    title: 'Tens', kind: 'power of ten', blurb: '10, 100, 1000… up to a googol!',
+    val: i => 10n ** B(i + 1),
+    is: v => v >= 10n && isPow10(v),
+    idx: v => v < 10n ? -1 : digits(v) - 2,
+    next: v => v < 10n ? 10n : 10n ** B(digits(v)),
+    cap: v => v >= 100n && v < BIG ? '10' + sup(digits(v) - 1) : '',
+    say: v => v >= 100n && v < 1000000n ? `That's ten to the ${digits(v) - 1}.` : ''
+  }
+};
+
+const OPS = {
+  add: { title: 'Adding',    sym: '+', word: 'plus',      level: 'Easy',   apply: v => v.reduce((a, b) => a + b, 0n) },
+  sub: { title: 'Take away', sym: '−', word: 'take away', level: 'Medium', apply: v => v.slice(1).reduce((a, b) => a - b, v[0]) },
+  mul: { title: 'Times',     sym: '×', word: 'times',     level: 'Hard',   apply: v => v.reduce((a, b) => a * b, 1n) }
+};
+
+// A pair of touching tiles that always makes a legal move (used if the board ever gets stuck).
+const PLANT = {
+  add: { doubling: [2, 2], squares: [1, 3], cubes: [1, 7], tens: [3, 7] },
+  sub: { doubling: [3, 1], squares: [5, 1], cubes: [9, 1], tens: [12, 2] },
+  mul: { doubling: [2, 2], squares: [2, 2], cubes: [2, 4], tens: [2, 5] }
+};
+const EXAMPLES = {
+  doubling: { add: ['2 + 2 = 4', '4 + 4 = 8', '2 + 2 + 4 = 8'], sub: ['3 − 1 = 2', '6 − 2 = 4', '16 − 8 = 8'], mul: ['2 × 2 = 4', '2 × 4 = 8', '64 × 64 = 4096'] },
+  squares:  { add: ['1 + 3 = 4', '4 + 5 = 9', '9 + 7 = 16'], sub: ['5 − 1 = 4', '10 − 1 = 9', '25 − 9 = 16'], mul: ['2 × 2 = 4', '3 × 3 = 9', '4 × 9 = 36'] },
+  cubes:    { add: ['1 + 7 = 8', '4 + 4 = 8', '8 + 19 = 27'], sub: ['9 − 1 = 8', '10 − 2 = 8', '29 − 2 = 27'], mul: ['2 × 2 × 2 = 8', '2 × 4 = 8', '8 × 8 = 64'] },
+  tens:     { add: ['3 + 7 = 10', '40 + 60 = 100', '10 + 90 = 100'], sub: ['12 − 2 = 10', '103 − 3 = 100', '1001 − 1 = 1000'], mul: ['2 × 5 = 10', '10 × 10 = 100', '10³ × 10⁴ = 10⁷'] }
+};
+
+/* ---------------- storage ---------------- */
+const SAVE_KEY = 'mathmerge.v2';
+let store = { ladder: 'doubling', op: 'add', voice: true, sound: true, seenHelp: false, games: {}, best: {}, trophies: {} };
+try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s) store = Object.assign(store, s); } catch (e) {}
+if (!LADDERS[store.ladder]) store.ladder = 'doubling';
+function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(store)); } catch (e) {} }
+const modeKey = () => store.ladder + '-' + store.op;
+const L = () => LADDERS[store.ladder];
+const O = () => OPS[store.op];
+
+/* ---------------- helpers ---------------- */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function pickW(items, weights) {
+  let t = weights.reduce((a, b) => a + b, 0), r = Math.random() * t;
+  for (let i = 0; i < items.length; i++) { r -= weights[i]; if (r < 0) return items[i]; }
+  return items[items.length - 1];
+}
+function lightColor(hex) {
+  const n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.6;
+}
+const pal = i => PALETTE[((i % PALETTE.length) + PALETTE.length) % PALETTE.length];
+// Small numbers: color by ladder step. Big numbers: color by how many digits (each 10ⁿ its own color).
+const colorIdx = v => v < 1000000n ? L().idx(v) : digits(v) + 3;
+const colorFor = v => L().is(v) ? pal(colorIdx(v)) : HELPER;
+const textOn = col => lightColor(col) ? '#2b1d00' : '#fff';
+// Take-away on squares/cubes starts at 4 / 8 (otherwise it's endless 2 − 1 = 1).
+const minIdx = () => (store.op === 'sub' && (store.ladder === 'squares' || store.ladder === 'cubes')) ? 1 : 0;
+const minVal = () => L().val(minIdx());
+const valid = res => res >= minVal() && L().is(res);
+function whyNot(res) {
+  if (res < 1n) return 'Too much taken away';
+  if (!L().is(res)) return `${fmt(res)} is not a ${L().kind}`;
+  return `Make ${fmt(minVal())} or bigger`;
+}
+function whyNotSpoken(res) {
+  if (res < 1n) return 'Oops! Too much taken away';
+  if (!L().is(res)) return `${sayNum(res)} is not a ${L().kind}`;
+  return `Make ${sayNum(minVal())} or bigger`;
+}
+const rc = i => [Math.floor(i / COLS), i % COLS];
+const NB = [];
+for (let i = 0; i < N; i++) {
+  const [r, c] = rc(i), list = [];
+  for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+    if (!dr && !dc) continue;
+    const rr = r + dr, cc = c + dc;
+    if (rr >= 0 && rr < ROWS && cc >= 0 && cc < COLS) list.push(rr * COLS + cc);
+  }
+  NB.push(list);
+}
+const adjacent = (a, b) => NB[a].includes(b);
+
+/* ---------------- game state ---------------- */
+let G = null;            // { grid: [{id, v:BigInt}], best: BigInt }
+let nextId = 1, chain = [], busy = false, lastPt = null, hintPath = null, hintTimer = 0, eqHoldUntil = 0;
+let cell = 60, gap = 4;
+const tiles = new Map(); // id -> element
+const board = $('#board'), lineSvg = $('#line');
+const newTile = v => ({ id: nextId++, v: B(v) });
+
+function boardMax() {
+  let m = 0n;
+  for (const t of G.grid) if (t && t.v > m && L().is(t.v)) m = t.v;
+  return m;
+}
+const topIdx = () => { const m = boardMax(); return m ? L().idx(m) : -1; };
+const goalValue = () => { const v = L().next(G.best); return v < minVal() ? minVal() : v; };
+const goalIdx = () => L().idx(goalValue());
+
+// What number appears in a new tile. Tuned per level + math so there are always things to make.
+function spawnValue() {
+  const lad = L(), ld = store.ladder, r = Math.random();
+  const top = Math.max(0, topIdx());
+  if (store.op === 'add') {
+    if (ld === 'doubling') {
+      const lo = Math.max(0, top - 5);
+      return lad.val(lo + pickW([0, 1, 2], [6, 3, 1]));
+    }
+    if (ld === 'tens') { // number bonds: 3 + 7 = 10, 40 + 60 = 100, 300 + 700 = 1000
+      const E = Math.max(0, topIdx() + 1);
+      const e = Math.max(0, E - pickW([0, 1, 2], [3, 2, 1]));
+      return B(1 + Math.floor(Math.random() * 9)) * 10n ** B(e);
+    }
+    if (r < 0.5) return B(ld === 'squares' ? pickW([1, 2, 3], [5, 2, 3]) : pickW([1, 2, 3, 4], [5, 3, 2, 2]));
+    if (r < 0.8) { // the "gap" from one ladder number to the next (e.g. 9 + 7 = 16)
+      const i = Math.max(0, top - pickW([0, 1, 2], [5, 3, 2]));
+      return lad.val(i + 1) - lad.val(i);
+    }
+    return lad.val(pickW([0, 1, 2], [5, 3, 2]));
+  }
+  if (store.op === 'mul') {
+    if (ld === 'doubling') {
+      const lo = Math.max(0, Math.floor(top / 5));   // grows slowly, so a googol takes a while
+      return lad.val(lo + pickW([0, 1, 2], [6, 3, 1]));
+    }
+    if (ld === 'squares') return B(r < 0.85 ? pickW([2, 3, 4, 5, 6, 7], [10, 10, 4, 3, 1, 1]) : pickW([4, 9], [2, 1]));
+    if (ld === 'tens') return B(pickW([2, 5, 10, 100, 4, 25, 1000], [3, 3, 6, 2, 1, 1, 1]));
+    return B(r < 0.9 ? pickW([2, 3, 4, 5], [10, 7, 3, 1]) : 8);
+  }
+  // take away: small numbers, plus "ladder number + a little" so the kid can take the little bit away
+  const g = goalIdx();
+  if (r < 0.4) return B(pickW([1, 2, 3], [4, 3, 2]));
+  if (r < 0.85) {
+    const i = Math.max(minIdx(), g - pickW([0, 1, 2], [2, 2, 1]));
+    return lad.val(i) + B(pickW([1, 2, 3], [4, 3, 2]));
+  }
+  return lad.val(Math.max(minIdx(), Math.min(g, pickW([0, 1, 2, 3], [4, 3, 2, 1]))));
+}
+
+// Find a legal chain (shortest first). Returns list of indices or null.
+function findMove(maxLen = 5) {
+  const op = O().apply, order = [...Array(N).keys()].sort(() => Math.random() - 0.5);
+  const path = [];
+  function dfs(len) {
+    if (path.length === len) return valid(op(path.map(i => G.grid[i].v)));
+    if (store.op === 'sub' && path.length >= 2 && op(path.map(i => G.grid[i].v)) < 1n) return false;
+    const last = path[path.length - 1];
+    for (const n of NB[last]) {
+      if (path.includes(n)) continue;
+      path.push(n);
+      if (dfs(len)) return true;
+      path.pop();
+    }
+    return false;
+  }
+  for (let len = 2; len <= maxLen; len++) {
+    for (const s of order) {
+      path.length = 0; path.push(s);
+      if (dfs(len)) return path.slice();
+    }
+  }
+  return null;
+}
+
+function plant() {
+  const a = Math.floor(Math.random() * N), b = NB[a][Math.floor(Math.random() * NB[a].length)];
+  const [x, y] = PLANT[store.op][store.ladder];
+  G.grid[a].v = B(x); G.grid[b].v = B(y);
+}
+function shuffleArr(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } }
+function makeSolvable() {
+  let tries = 0;
+  while (!findMove(4) && tries++ < 15) shuffleArr(G.grid);
+  if (!findMove(4)) plant();
+}
+
+/* ---------------- rendering ---------------- */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+}
+function layout() {
+  const wrap = $('#boardWrap');
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  cell = Math.max(30, Math.floor(Math.min(W / COLS, H / ROWS)));
+  gap = Math.max(3, Math.round(cell * 0.055));
+  board.style.width = cell * COLS + 'px';
+  board.style.height = cell * ROWS + 'px';
+  lineSvg.setAttribute('width', cell * COLS);
+  lineSvg.setAttribute('height', cell * ROWS);
+  for (const el of tiles.values()) el._v = null; // force repaint at new size
+}
+function posEl(el, r, c, s = 1) {
+  el.style.transform = `translate(${c * cell + gap}px,${r * cell + gap}px) scale(${s})`;
+}
+function makeEl() {
+  const el = document.createElement('div');
+  el.className = 'tile';
+  el.innerHTML = '<div class="face"><b></b><i></i></div>';
+  board.appendChild(el);
+  return el;
+}
+// What a tile shows: [big text, small text under it, is the small text a "×10ⁿ"]
+function tileText(v) {
+  const s = v.toString(), isL = L().is(v);
+  if (s.length <= 5) return [s, isL ? L().cap(v) : '', false];
+  if (isPow10(v)) { const c = isL ? L().cap(v) : ''; return ['10' + sup(s.length - 1), c.length <= 9 ? c : '', false]; }
+  const [m, e] = sci(v);
+  return [m, '×10' + sup(e), true];
+}
+function paintEl(el, v) {
+  if (el._v === v) return;
+  el._v = v;
+  const size = cell - 2 * gap, face = el.firstChild, isL = L().is(v);
+  el.style.width = el.style.height = size + 'px';
+  const col = isL ? pal(colorIdx(v)) : HELPER;
+  face.style.background = col;
+  face.style.color = isL ? textOn(col) : '#dfe5ff';
+  face.classList.toggle('helper', !isL);
+  const [txt, cap, sciCap] = tileText(v);
+  const scale = [0, 0.5, 0.45, 0.36, 0.29, 0.24, 0.21][Math.min(txt.length, 6)];
+  face.firstChild.textContent = txt;
+  face.firstChild.style.fontSize = size * scale * (cap ? (sciCap ? 0.85 : 0.92) : 1) + 'px';
+  face.lastChild.textContent = cap.length <= 9 ? cap : '';
+  face.lastChild.style.fontSize = size * (sciCap ? 0.24 : cap.length > 5 ? 0.14 : 0.17) + 'px';
+  face.lastChild.style.opacity = sciCap ? '1' : '';
+  face.lastChild.style.display = cap && cap.length <= 9 ? '' : 'none';
+}
+function render() {
+  const seen = new Set();
+  G.grid.forEach((t, i) => {
+    if (!t) return;
+    seen.add(t.id);
+    const [r, c] = rc(i);
+    let el = tiles.get(t.id);
+    if (!el) {
+      el = makeEl(); tiles.set(t.id, el); paintEl(el, t.v);
+      const from = t.spawnRow ?? r;
+      el.style.transition = 'none';
+      posEl(el, from, c);
+      void el.offsetWidth;
+      const dist = r - from;
+      el.style.transition = dist > 0 ? `transform ${0.2 + dist * 0.045}s cubic-bezier(.34,1.25,.64,1), opacity .2s` : '';
+      if (dist > 0) setTimeout(() => { el.style.transition = ''; }, 800);
+      delete t.spawnRow;
+    }
+    paintEl(el, t.v);
+    const sel = chain.includes(i);
+    posEl(el, r, c, sel ? 0.9 : 1);
+    el.firstChild.classList.toggle('sel', sel);
+    el.style.opacity = '1';
+    el.style.zIndex = '1';
+  });
+  for (const [id, el] of tiles) if (!seen.has(id)) { el.remove(); tiles.delete(id); }
+}
+function center(i) { const [r, c] = rc(i); return [(c + 0.5) * cell, (r + 0.5) * cell]; }
+function drawChain() {
+  let html = '';
+  if (chain.length) {
+    const pts = chain.map(center);
+    let col = 'rgba(255,255,255,.55)';
+    if (chain.length >= 2) { const res = chainResult(); if (valid(res)) col = colorFor(res); }
+    html += `<polyline points="${pts.map(p => p.join(',')).join(' ')}" fill="none" stroke="${col}" stroke-width="${cell * 0.12}" stroke-linecap="round" stroke-linejoin="round" opacity=".75"/>`;
+    html += pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="${cell * 0.075}" fill="${col}" opacity=".95"/>`).join('');
+  } else if (hintPath) {
+    const pts = hintPath.map(center);
+    html += `<polyline points="${pts.map(p => p.join(',')).join(' ')}" fill="none" stroke="#fff" stroke-width="${cell * 0.08}" stroke-dasharray="${cell * 0.12} ${cell * 0.12}" stroke-linecap="round" opacity=".85"/>`;
+  }
+  lineSvg.innerHTML = html;
+}
+const chainVals = () => chain.map(i => G.grid[i].v);
+const chainResult = () => O().apply(chainVals());
+function eqString(vals, res) {
+  let s = vals.map(fmt).join(` ${O().sym} `);
+  if (vals.length >= 2) s += ` = ${fmt(res)}`;
+  return s;
+}
+function setEq(text, cls, note) {
+  const eq = $('#eq');
+  eq.textContent = text;
+  eq.className = cls || '';
+  eq.style.fontSize = Math.max(16, Math.min(36, Math.floor(560 / Math.max(10, text.length)))) + 'px';
+  $('#eqNote').textContent = note || '';
+}
+function idleGoal() {
+  if (G.best >= GOOGOL) return ['🏆 Googol! 🏆', 'You reached the top. Make another!'];
+  const gv = goalValue();
+  if (gv < BIG) return [`Make ${fmt(gv)} ⭐`, 'Slide across tiles that touch'];
+  const ge = Math.min(100, digits(G.best));
+  return [`Reach 10${sup(ge)} ⭐`, nameOf(10n ** B(ge))];
+}
+function showEq() {
+  if (!chain.length) {
+    if (Date.now() < eqHoldUntil) return;
+    const [a, b] = idleGoal();
+    setEq(a, 'idle', b);
+    return;
+  }
+  const vals = chainVals();
+  if (vals.length < 2) { setEq(fmt(vals[0]), '', `Now slide to a touching tile`); return; }
+  const res = O().apply(vals), ok = valid(res);
+  setEq(eqString(vals, res), ok ? 'good' : 'bad', ok ? `${fmt(res)} is a ${L().kind}! Let go!` : whyNot(res));
+}
+function updateHUD() {
+  const lad = L(), gv = goalValue();
+  let h = '';
+  const chip = (txt, cls, col) => `<div class="rung ${cls}"${col ? ` style="background:${col};color:${textOn(col)}"` : ''}>${txt}</div>`;
+  if (gv < BIG && G.best < BIG) {
+    // the ladder itself: 4 › 9 › [16] › 25 › 36
+    const g = lad.idx(gv), from = Math.max(minIdx(), g - 2), to = from + 4;
+    for (let i = from; i <= to; i++) {
+      const v = lad.val(i), txt = fmt(v);
+      if (v <= G.best) h += chip(txt, '', pal(colorIdx(v)));
+      else if (i === g) h += chip(txt, 'goal');
+      else h += chip(txt, '');
+      if (i < to) h += '<span class="arrow">›</span>';
+    }
+  } else {
+    // orders of magnitude: 10⁴⁰ › 10⁴¹ › [10⁴²] › 10⁴³ › 10⁴⁴
+    const bestE = digits(G.best) - 1, ge = Math.min(100, bestE + 1);
+    const from = Math.max(1, Math.min(ge - 2, 96)), to = from + 4;
+    for (let k = from; k <= to; k++) {
+      const txt = (k === 100 ? '🏆' : '') + '10' + sup(k);
+      if (k <= bestE) h += chip(txt, '', pal(k + 4));
+      else if (k === ge) h += chip(txt, 'goal');
+      else h += chip(txt, '');
+      if (k < to) h += '<span class="arrow">›</span>';
+    }
+  }
+  $('#ladder').innerHTML = h;
+  $('#modeLabel').innerHTML = `${lad.title}<small>${O().title} · ${O().level}</small>`;
+  $('#voiceBtn').textContent = store.voice ? '🔊' : '🔇';
+  showEq();
+}
+function retrigger(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+let toastTimer = 0;
+function toast(t1, t2 = '', ms = 1500) {
+  const el = $('#toast');
+  el.querySelector('.t1').textContent = t1;
+  el.querySelector('.t2').textContent = t2;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), ms);
+}
+function confetti(n = 46) {
+  const fx = $('#fx');
+  for (let k = 0; k < n; k++) {
+    const d = document.createElement('div');
+    d.className = 'conf';
+    d.style.left = Math.random() * 100 + 'vw';
+    d.style.background = PALETTE[k % PALETTE.length];
+    d.style.setProperty('--dx', (Math.random() * 120 - 60) + 'px');
+    d.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+    d.style.animationDelay = Math.random() * 0.35 + 's';
+    fx.appendChild(d);
+    setTimeout(() => d.remove(), 2300);
+  }
+}
+
+/* ---------------- sound + voice ---------------- */
+let AC = null;
+function audio() {
+  if (!store.sound) return null;
+  try {
+    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+    if (AC.state === 'suspended') AC.resume();
+  } catch (e) { return null; }
+  return AC;
+}
+function tone(f, d = 0.09, type = 'sine', vol = 0.12, delay = 0) {
+  const ac = audio(); if (!ac || !isFinite(f)) return;
+  const t = ac.currentTime + delay, o = ac.createOscillator(), g = ac.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + 0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  o.connect(g).connect(ac.destination);
+  o.start(t); o.stop(t + d + 0.03);
+}
+const STEPS = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24];
+const sfxStep = n => tone(330 * 2 ** (STEPS[Math.min(n, STEPS.length - 1)] / 12), 0.1, 'triangle', 0.12);
+const sfxMerge = () => [0, 4, 7, 12].forEach((s, k) => tone(523 * 2 ** (s / 12), 0.16, 'triangle', 0.12, k * 0.055));
+const sfxBad = () => { tone(196, 0.16, 'square', 0.035); tone(165, 0.22, 'square', 0.035, 0.12); };
+const sfxStar = () => [0, 4, 7, 12, 16, 19, 24].forEach((s, k) => tone(659 * 2 ** (s / 12), 0.18, 'sine', 0.11, k * 0.07));
+const sfxShuffle = () => [0, 3, 6, 9].forEach((s, k) => tone(440 * 2 ** (s / 12), 0.06, 'sine', 0.07, k * 0.04));
+function say(text) {
+  if (!store.voice) return;
+  try {
+    if (window.Android && window.Android.speak) { window.Android.speak(text); return; }
+    if ('speechSynthesis' in window) {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 0.95; u.pitch = 1.1;
+      speechSynthesis.speak(u);
+    }
+  } catch (e) {}
+}
+function buzz(ms) { try { if (window.Android && window.Android.vibrate) window.Android.vibrate(ms); else if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {} }
+
+/* ---------------- input ---------------- */
+function localPt(e) { const b = board.getBoundingClientRect(); return { x: e.clientX - b.left, y: e.clientY - b.top }; }
+function idxAt(x, y, strict) {
+  const c = Math.floor(x / cell), r = Math.floor(y / cell);
+  if (c < 0 || c >= COLS || r < 0 || r >= ROWS) return -1;
+  if (strict) {
+    const dx = x - (c + 0.5) * cell, dy = y - (r + 0.5) * cell;
+    if (dx * dx + dy * dy > (cell * 0.44) ** 2) return -1;
+  }
+  return r * COLS + c;
+}
+function chainChanged() { render(); drawChain(); showEq(); }
+function handlePoint(p) {
+  const i = idxAt(p.x, p.y, true);
+  if (i < 0 || !G.grid[i]) return;
+  const pos = chain.indexOf(i);
+  if (pos === chain.length - 1) return;
+  if (pos >= 0 && pos === chain.length - 2) { chain.pop(); sfxStep(chain.length - 1); chainChanged(); return; }
+  if (pos === -1 && adjacent(i, chain[chain.length - 1])) { chain.push(i); sfxStep(chain.length - 1); chainChanged(); }
+}
+board.addEventListener('pointerdown', e => {
+  if (busy || chain.length) return;
+  audio();
+  const p = localPt(e), i = idxAt(p.x, p.y, false);
+  if (i < 0 || !G.grid[i]) return;
+  try { board.setPointerCapture(e.pointerId); } catch (_) {}
+  clearHint();
+  eqHoldUntil = 0;
+  chain = [i]; lastPt = p;
+  sfxStep(0); chainChanged();
+});
+board.addEventListener('pointermove', e => {
+  if (!chain.length) return;
+  const p = localPt(e);
+  const dx = p.x - lastPt.x, dy = p.y - lastPt.y;
+  const steps = Math.max(1, Math.ceil(Math.hypot(dx, dy) / (cell / 6)));
+  for (let k = 1; k <= steps; k++) handlePoint({ x: lastPt.x + dx * k / steps, y: lastPt.y + dy * k / steps });
+  lastPt = p;
+});
+board.addEventListener('pointerup', () => finishChain());
+board.addEventListener('pointercancel', () => finishChain());
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+function finishChain() {
+  if (!chain.length) return;
+  const path = chain.slice();
+  chain = [];
+  if (path.length < 2) { chainChanged(); return; }
+  const vals = path.map(i => G.grid[i].v), res = O().apply(vals);
+  if (valid(res)) { merge(path, vals, res); return; }
+  chainChanged();
+  setEq(eqString(vals, res), 'bad', whyNot(res) + '. Try again!');
+  eqHoldUntil = Date.now() + 1800;
+  setTimeout(showEq, 1850);
+  path.forEach(i => retrigger(tiles.get(G.grid[i].id).firstChild, 'wob'));
+  sfxBad();
+  say(whyNotSpoken(res) + '. Try again.');
+}
+
+function gravity() {
+  for (let c = 0; c < COLS; c++) {
+    const col = [];
+    for (let r = ROWS - 1; r >= 0; r--) { const t = G.grid[r * COLS + c]; if (t) col.push(t); }
+    const missing = ROWS - col.length;
+    for (let r = ROWS - 1, k = 0; r >= 0; r--, k++) G.grid[r * COLS + c] = k < col.length ? col[k] : null;
+    for (let r = missing - 1; r >= 0; r--) {
+      const t = newTile(spawnValue());
+      t.spawnRow = r - missing;
+      G.grid[r * COLS + c] = t;
+    }
+  }
+}
+
+// Decide how to celebrate a new best number.
+function celebration(oldBest, res) {
+  if (res >= GOOGOL) return { kind: 'googol' };
+  if (res <= oldBest) return null;
+  if (res < BIG) return { kind: 'step' };
+  const ne = digits(res) - 1, oe = oldBest > 0n ? digits(oldBest) - 1 : 0;
+  if (ne >= 6 && ne < 66 && Math.floor(ne / 3) > Math.floor(oe / 3)) return { kind: 'name', word: ILLIONS[Math.floor(ne / 3)], e: ne };
+  if (ne >= 66 && Math.floor(ne / 10) > Math.floor(oe / 10)) return { kind: 'power', e: ne };
+  return null;
+}
+
+async function merge(path, vals, res) {
+  busy = true;
+  const last = path[path.length - 1], [lr, lc] = rc(last);
+  const party = celebration(G.best, res);
+  const isNew = res > G.best;
+  setEq(eqString(vals, res), 'good', party ? `⭐ New: ${fmt(res)}! ⭐` : (res >= 1000000n ? nameOf(res) : 'Great job!'));
+  eqHoldUntil = Date.now() + 1500;
+  setTimeout(showEq, 1550);
+  sfxMerge(); buzz(25);
+  const small = res < 1000000n && vals.every(v => v < 1000000n);
+  let speech = small ? vals.map(String).join(` ${O().word} `) + ` equals ${res}.` : `${sayNum(res)}!`;
+  if (party && party.kind === 'step') speech += ` Wow! You made ${res}! ` + L().say(res);
+  if (party && (party.kind === 'name' || party.kind === 'power'))
+    speech = `Wow! You made ${sayNum(res)}! That number has ${digits(res)} digits!`;
+  if (party && party.kind === 'googol') speech = `A googol! That's a one with a hundred zeros! You reached the top!`;
+  say(speech);
+  drawChain();
+  render(); // un-highlight
+  for (const i of path.slice(0, -1)) { const el = tiles.get(G.grid[i].id); posEl(el, lr, lc, 0.4); el.style.opacity = '0'; el.style.zIndex = '0'; }
+  await sleep(190);
+  path.slice(0, -1).forEach(i => { G.grid[i] = null; });
+  G.grid[last].v = res;
+  if (isNew) G.best = res;
+  const prevBest = store.best[modeKey()] ? B(store.best[modeKey()]) : 0n;
+  if (res > prevBest) store.best[modeKey()] = res.toString();
+  render();
+  retrigger(tiles.get(G.grid[last].id).firstChild, 'pop');
+  await sleep(150);
+  if (party && party.kind === 'googol') {
+    store.trophies[modeKey()] = (store.trophies[modeKey()] || 0) + 1;
+    confetti(120); sfxStar();
+    toast('🏆 GOOGOL! 🏆', '10¹⁰⁰ — a 1 with 100 zeros!', 3000);
+    await sleep(900);
+    const el = tiles.get(G.grid[last].id);
+    posEl(el, lr, lc, 1.8); el.style.opacity = '0';
+    await sleep(300);
+    G.grid[last] = null;
+  }
+  gravity(); render();
+  await sleep(320);
+  updateHUD();
+  if (party && party.kind === 'step') {
+    confetti(); sfxStar();
+    const cap = L().cap(res);
+    toast(`You made ${fmt(res)}!`, cap ? `${cap} = ${fmt(res)}` : '⭐', 1700);
+  } else if (party && party.kind === 'name') {
+    confetti(90); sfxStar();
+    toast(`${party.word.toUpperCase()}!`, `${fmt(res)} = ${nameOf(res)}`, 2600);
+  } else if (party && party.kind === 'power') {
+    confetti(90); sfxStar();
+    toast(`10${sup(party.e)}!`, `${digits(res)} digits long!`, 2400);
+  }
+  if (!findMove()) {
+    await sleep(party ? 1400 : 300);
+    toast('No moves!', 'Shuffling…', 1200);
+    await sleep(500);
+    await shuffleBoard(true);
+  }
+  save();
+  busy = false;
+}
+
+async function shuffleBoard(auto) {
+  busy = true;
+  clearHint();
+  shuffleArr(G.grid);
+  makeSolvable();
+  sfxShuffle();
+  render();
+  await sleep(350);
+  save();
+  if (!auto) busy = false;
+}
+
+function clearHint() {
+  hintPath = null; clearTimeout(hintTimer);
+  document.querySelectorAll('.face.hint').forEach(f => f.classList.remove('hint'));
+  drawChain();
+}
+function showHint() {
+  if (busy) return;
+  clearHint();
+  const m = findMove();
+  if (!m) { shuffleBoard(); return; }
+  hintPath = m; drawChain();
+  m.forEach((i, k) => { const f = tiles.get(G.grid[i].id).firstChild; f.style.animationDelay = k * 0.12 + 's'; retrigger(f, 'hint'); });
+  hintTimer = setTimeout(clearHint, 2600);
+}
+
+/* ---------------- game lifecycle ---------------- */
+function save() {
+  if (!G) return;
+  store.games[modeKey()] = { grid: G.grid.map(t => t.v.toString()), best: G.best.toString() };
+  persist();
+}
+function clearBoardEls() { for (const el of tiles.values()) el.remove(); tiles.clear(); }
+function startGame(fresh) {
+  const saved = !fresh && store.games[modeKey()];
+  clearBoardEls(); chain = []; hintPath = null; busy = false; eqHoldUntil = 0;
+  G = { grid: [], best: 0n };
+  showScreen('game');
+  layout();
+  let ok = false;
+  if (saved && Array.isArray(saved.grid) && saved.grid.length === N) {
+    try {
+      G.grid = saved.grid.map(v => newTile(B(v)));
+      G.best = B(saved.best || '0');
+      ok = true;
+      if (!findMove()) makeSolvable();
+    } catch (e) { ok = false; G = { grid: [], best: 0n }; }
+  }
+  if (!ok) {
+    for (let i = 0; i < N; i++) G.grid.push(newTile(spawnValue()));
+    makeSolvable();
+    G.grid.forEach((t, i) => { t.spawnRow = rc(i)[0] - ROWS - 1; });
+  }
+  render(); drawChain(); updateHUD(); save();
+  if (!store.seenHelp) showHelp();
+}
+function goMenu() {
+  if (G) save();
+  G = null; clearBoardEls(); chain = [];
+  buildMenu(); showScreen('menu');
+}
+
+/* ---------------- overlays ---------------- */
+let overlayClose = null;
+function openOverlay(html, bind) {
+  $('#card').innerHTML = html;
+  $('#overlay').classList.add('show');
+  overlayClose = () => { $('#overlay').classList.remove('show'); overlayClose = null; };
+  if (bind) bind();
+}
+function showHelp() {
+  const lad = L();
+  openOverlay(`
+    <h2>How to play</h2>
+    <p>👆 Slide your finger across tiles that <b>touch</b> — sideways, up, down or corners.</p>
+    <p>🧮 Watch the math at the top.</p>
+    <p>⭐ If the answer is a <b>${lad.kind}</b>, let go and the tiles join together!</p>
+    <div class="ex">${EXAMPLES[store.ladder][store.op].map(x => `<div>${x}</div>`).join('')}</div>
+    <p>🚀 How big can you go? Million, billion… all the way to a <b>googol</b> (10¹⁰⁰)!</p>
+    <p>💡 Stuck? Tap <b>Hint</b>.</p>
+    <div class="row"><button class="btn-yes" id="okHelp">Let's go!</button></div>`,
+    () => { $('#okHelp').onclick = () => { store.seenHelp = true; persist(); overlayClose(); }; });
+  say(`Slide across tiles that touch. If the answer is a ${lad.kind}, they join together!`);
+}
+function confirmNew() {
+  openOverlay(`<h2>Start a new game?</h2><div class="row"><button class="btn-no" id="noNew">No</button><button class="btn-yes" id="yesNew">Yes</button></div>`,
+    () => { $('#noNew').onclick = () => overlayClose(); $('#yesNew').onclick = () => { overlayClose(); startGame(true); }; });
+}
+
+/* ---------------- menu ---------------- */
+function buildMenu() {
+  $('#ladderChoices').innerHTML = Object.entries(LADDERS).map(([k, lad]) => {
+    const chips = [0, 1, 2, 3].map(i => {
+      const v = lad.val(i), col = pal(i), s = v.toString();
+      const txt = s.length <= 3 ? s : '10' + sup(s.length - 1);
+      return `<div class="chip" style="background:${col};color:${textOn(col)}">${isPow10(v) || s.length <= 3 ? txt : s}</div>`;
+    }).join('');
+    return `<button class="choice ${store.ladder === k ? 'sel' : ''}" data-l="${k}"><div><div class="big">${lad.title}</div><div class="small">${lad.blurb}</div></div><div class="chips">${chips}</div></button>`;
+  }).join('');
+  $('#opChoices').innerHTML = Object.entries(OPS).map(([k, op]) =>
+    `<button class="choice op ${store.op === k ? 'sel' : ''}" data-o="${k}"><div class="sym">${op.sym}</div><div class="name">${op.title}</div><div class="lvl">${op.level}</div></button>`).join('');
+  document.querySelectorAll('[data-l]').forEach(b => b.onclick = () => { store.ladder = b.dataset.l; persist(); buildMenu(); tone(660, 0.07); });
+  document.querySelectorAll('[data-o]').forEach(b => b.onclick = () => { store.op = b.dataset.o; persist(); buildMenu(); tone(660, 0.07); });
+  const best = store.best[modeKey()], saved = store.games[modeKey()], tro = store.trophies[modeKey()] || 0;
+  $('#bestLine').textContent = (best ? `Best in ${L().title} · ${O().title}: ${fmt(B(best))} ⭐` : `${L().title} · ${O().title}`) + (tro ? `  ·  🏆×${tro}` : '');
+  $('#playBtn').textContent = saved ? 'Continue ▶' : 'Play ▶';
+  $('#togVoice').textContent = `🗣️ Read math out loud: ${store.voice ? 'On' : 'Off'}`;
+  $('#togVoice').classList.toggle('on', store.voice);
+  $('#togSound').textContent = `🎵 Sounds: ${store.sound ? 'On' : 'Off'}`;
+  $('#togSound').classList.toggle('on', store.sound);
+}
+$('#playBtn').onclick = () => { audio(); startGame(false); };
+$('#togVoice').onclick = () => { store.voice = !store.voice; persist(); buildMenu(); if (store.voice) say('Voice on'); };
+$('#togSound').onclick = () => { store.sound = !store.sound; persist(); buildMenu(); tone(660, 0.07); };
+$('#homeBtn').onclick = () => goMenu();
+$('#voiceBtn').onclick = () => { store.voice = !store.voice; persist(); updateHUD(); if (store.voice) say('Voice on'); };
+$('#hintBtn').onclick = () => showHint();
+$('#shuffleBtn').onclick = () => { if (!busy) shuffleBoard(); };
+$('#helpBtn').onclick = () => showHelp();
+$('#newBtn').onclick = () => confirmNew();
+window.addEventListener('resize', () => { if (G) { layout(); render(); drawChain(); } });
+document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
+
+// Android back button: close popup → go to menu → exit app
+window.onAndroidBack = function () {
+  if (overlayClose) { overlayClose(); return true; }
+  if (G) { goMenu(); return true; }
+  return false;
+};
+
+buildMenu();
+// debug hooks for automated tests
+window.__mm = { get G() { return G; }, findMove, valid, O, L, store, startGame, fmt, nameOf, iroot, celebration, updateHUD, render,
+  get busy() { return busy; }, get cell() { return cell; } };
+</script>
+</body>
+</html>

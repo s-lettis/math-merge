@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Four rounded tiles joined by a chain line, with + and × marks -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- top-left: pink -->
+    <path android:fillColor="#FF4D6D"
+        android:pathData="M35,29h14a5,5 0 0 1 5,5v14a5,5 0 0 1 -5,5h-14a5,5 0 0 1 -5,-5v-14a5,5 0 0 1 5,-5z" />
+    <!-- top-right: blue -->
+    <path android:fillColor="#3A86FF"
+        android:pathData="M59,29h14a5,5 0 0 1 5,5v14a5,5 0 0 1 -5,5h-14a5,5 0 0 1 -5,-5v-14a5,5 0 0 1 5,-5z" />
+    <!-- bottom-left: yellow -->
+    <path android:fillColor="#FFC300"
+        android:pathData="M35,55h14a5,5 0 0 1 5,5v14a5,5 0 0 1 -5,5h-14a5,5 0 0 1 -5,-5v-14a5,5 0 0 1 5,-5z" />
+    <!-- bottom-right: purple -->
+    <path android:fillColor="#8B5CF6"
+        android:pathData="M59,55h14a5,5 0 0 1 5,5v14a5,5 0 0 1 -5,5h-14a5,5 0 0 1 -5,-5v-14a5,5 0 0 1 5,-5z" />
+    <!-- chain line -->
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="5" android:strokeLineCap="round"
+        android:strokeLineJoin="round" android:fillColor="#00000000"
+        android:pathData="M42,41L66,41L42,67L66,67" />
+    <!-- plus on pink -->
+    <path android:fillColor="#FFFFFF" android:pathData="M40.5,35h3v12h-3z M36,39.5h12v3h-12z" />
+    <!-- times on purple -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M61.4,60.3l2.1,-2.1l10,10l-2.1,2.1z M71.4,58.2l2.1,2.1l-10,10l-2.1,-2.1z" />
+</vector>
